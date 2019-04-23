@@ -3,7 +3,7 @@ import glob
 import cfn_flip
 import pprint
 import os
-from helpers import helpers
+from newport_helpers import helpers
 class CombineHelpers():
     def __init__(self, *args, **kwargs):
         return
