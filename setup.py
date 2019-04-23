@@ -8,9 +8,9 @@ setup(
     long_description=open('README.txt').read(),
     author='josjaf',
     author_email='josjaf@gmail.com',
-    install_requires=[
-        'boto3',
-        'botocore'
-    ],
+    # install_requires=[
+    #     'boto3',
+    #     'botocore'
+    # ],
     #url='https://gitlab.com/josjaf/newport_helpers/',
 )
