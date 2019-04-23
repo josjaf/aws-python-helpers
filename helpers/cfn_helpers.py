@@ -1,5 +1,5 @@
 import boto3
-from helpers import helpers
+from newport_helpers import helpers
 import botocore
 import uuid
 import datetime
