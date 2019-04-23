@@ -1,0 +1,3 @@
+aws-sam-translator==1.10.0
+boto3==1.9.134
+botocore==1.12.134
