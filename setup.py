@@ -6,4 +6,5 @@ setup(
     packages=['stacker_custom','helpers'],
     license='Creative Commons Attribution-Noncommercial-Share Alike license',
     long_description=open('README.txt').read(),
+    url='https://gitlab.com/josjaf/newport_helpers/',
 )
