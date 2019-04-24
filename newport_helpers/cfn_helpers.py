@@ -322,7 +322,11 @@ class CfnHelpers():
         inprogress_status = ['RUNNING', 'STOPPING']
         inprogress_operations = [s for s in stack_set_operations if s['Status'] in inprogress_status]
         # DEBUG
-        #inprogress_operations.append({'OperationId': '36c885ba-5175-11e9-9095-186590de30c7', 'Action': 'CREATE', 'Status': 'RUNNING'})
+        #inprogress_operations.append({'OperationId': 'eb2b441e-564f-11e9-b959-0242ac110002', 'Action': 'CREATE', 'Status': 'RUNNING'})
+        # DEBUG
+        print("IN PROGRESS OPERATIONS:")
+        print(inprogress_operations)
+        print(f"LENGTH OF OPS ARRAY: {len(inprogress_operations)}")
         if len(inprogress_operations) == 0:
             return "No StackSets to wait on"
         for operation in inprogress_operations:
@@ -334,7 +338,7 @@ class CfnHelpers():
                     OperationId=operation['OperationId']
                 )
                 # DEBUG
-                #response['StackSetOperation']['Status'] = 'RUNNING'
+                # response['StackSetOperation']['Status'] = 'RUNNING'
                 if response['StackSetOperation']['Status'] in inprogress_status:
                     print(f"StackSet Id: {response['StackSetOperation']['OperationId']} still running")
 
