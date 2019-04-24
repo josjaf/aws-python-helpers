@@ -304,6 +304,12 @@ class CfnHelpers():
             raise RuntimeError(f"Could not find output {output} in {stack_name}")
         return output_value
     def get_stack_set_operations(self, client_session, stack_set_name, inprogress_status):
+        """
+        :param client_session:
+        :param stack_set_name:
+        :param inprogress_status:
+        :return:
+        """
         stack_set_operations = []
         paginator = client_session.get_paginator('list_stack_set_operations')
         try:
@@ -331,12 +337,16 @@ class CfnHelpers():
         inprogress_status = ['RUNNING', 'STOPPING']
         inprogress_operations = self.get_stack_set_operations(cfn, stack_set_name, inprogress_status)
         if len(inprogress_operations) == 0:
-            time.sleep(10) #
-            inprogress_operations = self.get_stack_set_operations(cfn, stack_set_name, inprogress_status) # populate again
+            poll_count = 0
+            while len(inprogress_operations) < 1 and poll_count <= 6:
+                poll_count += 1 #increment loop count
+                time.sleep(5) #sleep for 5 seconds
+                inprogress_operations = self.get_stack_set_operations(cfn, stack_set_name, inprogress_status) # populate again
+
             if len(inprogress_operations) == 0: # Are you SURE there are no stack set operations running
                 return "No StackSets to wait on"
             else:
-                print("STACK SET API RETURNED 0, WAITED 10s, NOW THERE IS AN OPERATION!!")
+                print(f"STACK SET API RETURNED 0, WAITED {5*poll_count}s, NOW THERE IS AN OPERATION!!")
         for operation in inprogress_operations:
             running = True
             counter = 0
