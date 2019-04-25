@@ -335,6 +335,7 @@ class CfnHelpers():
         # print(inprogress_operations)
         # print(f"LENGTH OF OPS ARRAY: {len(inprogress_operations)}")
         inprogress_status = ['RUNNING', 'STOPPING']
+        # TODO decide whether or not ot pass in stack operation
         inprogress_operations = self.get_stack_set_operations(cfn, stack_set_name, inprogress_status)
         if len(inprogress_operations) == 0:
             poll_count = 0
@@ -346,7 +347,7 @@ class CfnHelpers():
             if len(inprogress_operations) == 0: # Are you SURE there are no stack set operations running
                 return "No StackSets to wait on"
             else:
-                print(f"STACK SET API RETURNED 0, WAITED {5*poll_count}s, NOW THERE IS AN OPERATION!!")
+                print(f"STACK SET API RETURNED 0, WAITED {(5*poll_count)}s, NOW THERE IS AN OPERATION!!")
         for operation in inprogress_operations:
             running = True
             counter = 0
