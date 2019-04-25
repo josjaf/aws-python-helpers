@@ -303,28 +303,80 @@ class CfnHelpers():
             print(f"Could not find output {output} in {stack_name}")
             raise RuntimeError(f"Could not find output {output} in {stack_name}")
         return output_value
-    def stack_set_waiter(self, session, stack_set_name):
-        cfn = session.client('cloudformation')
+    def get_stack_set_operations(self, client_session, stack_set_name, inprogress_status):
+        """
+        :param client_session:
+        :param stack_set_name:
+        :param inprogress_status:
+        :return:
+        """
         stack_set_operations = []
-        paginator = cfn.get_paginator('list_stack_set_operations')
+        paginator = client_session.get_paginator('list_stack_set_operations')
         try:
             response_iterator = paginator.paginate(
                 StackSetName=stack_set_name,
             )
             for page in response_iterator:
-                    for summary in page['Summaries']:
-                        stack_set_operations.append(summary)
+                for summary in page['Summaries']:
+                    stack_set_operations.append(summary)
         # stack set does not already exist
         except botocore.exceptions.ClientError as e:
             if e.response['Error']['Code'] == 'StackSetNotFoundException':
                 return False
 
-        inprogress_status = ['RUNNING', 'STOPPING']
         inprogress_operations = [s for s in stack_set_operations if s['Status'] in inprogress_status]
+        return inprogress_operations
+
+    def operation_id_waiter(self, session, stack_name, operation_response):
+        cfn = session.client('cloudformation')
+        inprogress_status = ['RUNNING', 'STOPPING']
+        op_id = operation_response['OperationId']
+        op_in_stack_list = False
+        while not op_in_stack_list:
+            for operation in self.get_stack_set_operations(cfn, stack_name, inprogress_status):
+                if operation['OperationId'] == op_id:
+                    print(f'Stack Set Operation {op_id} is in stack list')
+                    op_in_stack_list = True
+                else:
+                    print(f'Operation: {op_id} not present, sleeping...')
+                    time.sleep(5)
+        op_busy = True
+        loop_count = 0
+        while op_busy and loop_count < 60:
+            while op_busy:
+                response = cfn.describe_stack_set_operation(
+                    StackSetName=stack_name,
+                    OperationId=op_id
+                )
+                if response['StackSetOperation']['Status'] in inprogress_status:
+                    print(f"StackSet Id: {response['StackSetOperation']['OperationId']} still running, have been waiting for {(loop_count*15)}s")
+                    loop_count += 1
+                    time.sleep(15)
+                else:
+                    op_busy = False
+        return
+    def stack_set_waiter(self, session, stack_set_name):
+        cfn = session.client('cloudformation')
         # DEBUG
-        #inprogress_operations.append({'OperationId': '36c885ba-5175-11e9-9095-186590de30c7', 'Action': 'CREATE', 'Status': 'RUNNING'})
+        #inprogress_operations.append({'OperationId': 'eb2b441e-564f-11e9-b959-0242ac110002', 'Action': 'CREATE', 'Status': 'RUNNING'})
+        # DEBUG
+        # print("IN PROGRESS OPERATIONS:")
+        # print(inprogress_operations)
+        # print(f"LENGTH OF OPS ARRAY: {len(inprogress_operations)}")
+        inprogress_status = ['RUNNING', 'STOPPING']
+        # TODO decide whether or not ot pass in stack operation
+        inprogress_operations = self.get_stack_set_operations(cfn, stack_set_name, inprogress_status)
         if len(inprogress_operations) == 0:
-            return "No StackSets to wait on"
+            poll_count = 0
+            while len(inprogress_operations) < 1 and poll_count <= 6:
+                poll_count += 1 #increment loop count
+                time.sleep(5) #sleep for 5 seconds
+                inprogress_operations = self.get_stack_set_operations(cfn, stack_set_name, inprogress_status) # populate again
+
+            if len(inprogress_operations) == 0: # Are you SURE there are no stack set operations running
+                return "No StackSets to wait on"
+            else:
+                print(f"STACK SET API RETURNED 0, WAITED {(5*poll_count)}s, NOW THERE IS AN OPERATION!!")
         for operation in inprogress_operations:
             running = True
             counter = 0
@@ -334,9 +386,9 @@ class CfnHelpers():
                     OperationId=operation['OperationId']
                 )
                 # DEBUG
-                #response['StackSetOperation']['Status'] = 'RUNNING'
+                # response['StackSetOperation']['Status'] = 'RUNNING'
                 if response['StackSetOperation']['Status'] in inprogress_status:
-                    print(f"StackSet Id: {response['StackSetOperation']['OperationId']} still running")
+                    print(f"StackSet Id: {response['StackSetOperation']['OperationId']} still running, , have been waiting for {(counter*15)}s")
 
                     counter += 1
                     if counter > 60:
