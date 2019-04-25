@@ -326,6 +326,35 @@ class CfnHelpers():
 
         inprogress_operations = [s for s in stack_set_operations if s['Status'] in inprogress_status]
         return inprogress_operations
+
+    def operation_id_waiter(self, session, stack_name, operation_response):
+        cfn = session.client('cloudformation')
+        inprogress_status = ['RUNNING', 'STOPPING']
+        op_id = operation_response['OperationId']
+        op_in_stack_list = False
+        while not op_in_stack_list:
+            for operation in self.get_stack_set_operations(cfn, stack_name, inprogress_status):
+                if operation['OperationId'] == op_id:
+                    print(f'Stack Set Operation {op_id} is in stack list')
+                    op_in_stack_list = True
+                else:
+                    print(f'Operation: {op_id} not present, sleeping...')
+                    time.sleep(5)
+        op_busy = True
+        loop_count = 0
+        while op_busy and loop_count < 60:
+            while op_busy:
+                response = cfn.describe_stack_set_operation(
+                    StackSetName=stack_name,
+                    OperationId=op_id
+                )
+                if response['StackSetOperation']['Status'] in inprogress_status:
+                    print(f"StackSet Id: {response['StackSetOperation']['OperationId']} still running, waiting...")
+                    loop_count += 1
+                    time.sleep(15)
+                else:
+                    op_busy = False
+        return
     def stack_set_waiter(self, session, stack_set_name):
         cfn = session.client('cloudformation')
         # DEBUG
