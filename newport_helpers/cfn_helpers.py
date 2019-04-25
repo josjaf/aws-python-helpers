@@ -320,9 +320,10 @@ class CfnHelpers():
                 for summary in page['Summaries']:
                     stack_set_operations.append(summary)
         # stack set does not already exist
+        # this exception should never be caught, since the waiter is not called when the stack set does not currently exist
         except botocore.exceptions.ClientError as e:
             if e.response['Error']['Code'] == 'StackSetNotFoundException':
-                return False
+                return []
 
         inprogress_operations = [s for s in stack_set_operations if s['Status'] in inprogress_status]
         return inprogress_operations
