@@ -328,6 +328,13 @@ class CfnHelpers():
         return inprogress_operations
 
     def operation_id_waiter(self, session, stack_name, operation_response):
+        """
+        call this after an update or create operation, this will wait for the operation id to show up
+        :param session:
+        :param stack_name:
+        :param operation_response:
+        :return:
+        """
         cfn = session.client('cloudformation')
         inprogress_status = ['RUNNING', 'STOPPING']
         op_id = operation_response['OperationId']
