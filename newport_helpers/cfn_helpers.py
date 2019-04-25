@@ -349,7 +349,7 @@ class CfnHelpers():
                     OperationId=op_id
                 )
                 if response['StackSetOperation']['Status'] in inprogress_status:
-                    print(f"StackSet Id: {response['StackSetOperation']['OperationId']} still running, have been waiting for {(loop_count*15)}")
+                    print(f"StackSet Id: {response['StackSetOperation']['OperationId']} still running, have been waiting for {(loop_count*15)}s")
                     loop_count += 1
                     time.sleep(15)
                 else:
@@ -387,7 +387,7 @@ class CfnHelpers():
                 # DEBUG
                 # response['StackSetOperation']['Status'] = 'RUNNING'
                 if response['StackSetOperation']['Status'] in inprogress_status:
-                    print(f"StackSet Id: {response['StackSetOperation']['OperationId']} still running")
+                    print(f"StackSet Id: {response['StackSetOperation']['OperationId']} still running, , have been waiting for {(counter*15)}s")
 
                     counter += 1
                     if counter > 60:
