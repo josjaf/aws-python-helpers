@@ -350,7 +350,7 @@ class CfnHelpers():
                     time.sleep(5)
         op_busy = True
         loop_count = 0
-        while op_busy and loop_count < 60:
+        while op_busy and loop_count < 120:
             while op_busy:
                 response = cfn.describe_stack_set_operation(
                     StackSetName=stack_name,
@@ -396,10 +396,10 @@ class CfnHelpers():
                 # DEBUG
                 # response['StackSetOperation']['Status'] = 'RUNNING'
                 if response['StackSetOperation']['Status'] in inprogress_status:
-                    print(f"StackSet Id: {response['StackSetOperation']['OperationId']} still running, , have been waiting for {(counter*15)}s")
+                    print(f"StackSet Id: {response['StackSetOperation']['OperationId']} still running, have been waiting for {(counter*15)}s")
 
                     counter += 1
-                    if counter > 60:
+                    if counter > 120:
                         raise RuntimeError(f"{response['StackSetOperation']['OperationId']} took too long")
                     time.sleep(15)
 
