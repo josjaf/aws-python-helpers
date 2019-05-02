@@ -336,6 +336,9 @@ class CfnHelpers():
         :param operation_response:
         :return:
         """
+        if 'OperationId' not in operation_response:
+            print(f"Stack Set: {stack_name} did not contain operation response")
+            return
         cfn = session.client('cloudformation')
         inprogress_status = ['RUNNING', 'STOPPING']
         op_id = operation_response['OperationId']
