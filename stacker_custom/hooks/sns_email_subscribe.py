@@ -3,6 +3,16 @@ from __future__ import division
 from __future__ import absolute_import
 import os
 import boto3
+import logging
+
+from botocore.exceptions import ClientError
+
+from stacker.lookups.handlers.output import OutputLookup
+from stacker.lookups.handlers.rxref import RxrefLookup
+from stacker.lookups.handlers.xref import XrefLookup
+from stacker.lookups.handlers.envvar import EnvvarLookup
+from stacker.session_cache import get_session
+
 
 
 def handler(context, provider, **kwargs):
@@ -18,26 +28,62 @@ def handler(context, provider, **kwargs):
         conf_key: ${envvar file://envvar_value.txt}
         # Both of the above would resolve to
         conf_key: ENV_VALUE
+
+    """
+    """
+    Sample yaml
+    post_build:
+  - path: stacker_custom.hooks.sns_email_subscribe.handler
+    required: true
+    enabled: true
+    data_key: email_subscribe
+    args:
+      list_of_emails_var: emails
+      sns_rxref_lookup: base::SNSArn
+      #sample: ${output pipeline::PipelineName}
+      profile: ${profile_shared_account}
+      
+      
     """
     # value = read_value_from_path(value)
 
-    sts = boto3.client('sts')
-    response = sts.get_caller_identity()
     hook_return = {}
-    topic_arn = kwargs.get('SNSArn')
-    emails = kwargs.get('emails')
+    print(kwargs)
+    print(context)
+    topic_arn = kwargs.get('sns_rxref_lookup')
+    emails = kwargs.get('list_of_emails_var')
+
+
+
+    value = kwargs['sns_rxref_lookup']
+    sns_arn = RxrefLookup.handle(
+        value,
+        provider=provider,
+        context=context
+    )
+
+
+    value = kwargs['list_of_emails_var']
+    emails = EnvvarLookup.handle(
+        value,
+        provider=provider,
+        context=context
+    )
+    #import pdb; pdb.set_trace()
+    hook_returns = []
     try:
         sns = boto3.client('sns')
         for email in emails.split(','):
-
+            print(email)
             response = sns.subscribe(
-                TopicArn=topic_arn,
+                TopicArn=sns_arn,
                 Protocol='email',
                 Endpoint=email,
 
                 ReturnSubscriptionArn=True
             )
-        hook_return = {}
+            print(response)
+        hook_return = {'response': response}
         return hook_return
     except Exception as e:
         print(e)
