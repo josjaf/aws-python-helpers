@@ -3,7 +3,8 @@ from distutils.core import setup
 setup(
     name='newport_helpers',
     version='0.1dev',
-    packages=['stacker_custom','newport_helpers', 'stacker_custom/destroy_hooks', 'stacker_custom/hooks', 'stacker_custom/lookups'],
+    packages=['stacker_custom', 'newport_helpers', 'stacker_custom/destroy_hooks', 'stacker_custom/hooks',
+              'stacker_custom/lookups', 'stacker_custom/stacker_blueprints'],
     license='Creative Commons Attribution-Noncommercial-Share Alike license',
     long_description=open('README.txt').read(),
     author='josjaf',
@@ -13,5 +14,5 @@ setup(
         'botocore==1.12.134',
         'jmespath== 0.9.4'
     ],
-    #url='https://gitlab.com/josjaf/newport_helpers/',
+    # url='https://gitlab.com/josjaf/newport_helpers/',
 )
