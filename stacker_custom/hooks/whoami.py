@@ -25,6 +25,7 @@ def handler(context, provider, **kwargs):
     sts = boto3.client('sts')
     response = sts.get_caller_identity()
     hook_return = {}
+    hook_return['Account'] = response['Account']
     try:
         response_arn = response['Arn']
         if ':user/' not in response_arn:
@@ -32,6 +33,7 @@ def handler(context, provider, **kwargs):
             response_arn = response_arn.replace("assumed-role", "role")
             constructed_arn = response_arn.rsplit("/", 1)[0]
             hook_return['Arn'] = constructed_arn
+
         else:
             hook_return['Arn'] = response['Arn']
 
