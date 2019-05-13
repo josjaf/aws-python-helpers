@@ -10,6 +10,8 @@ from stacker.lookups.handlers.xref import XrefLookup
 from stacker.session_cache import get_session
 
 LOGGER = logging.getLogger(__name__)
+
+
 def delete_bucket(bucket_name, session):
     s3_resource = session.resource('s3')
     bucket = s3_resource.Bucket(bucket_name)
@@ -30,6 +32,7 @@ def delete_bucket(bucket_name, session):
     )
 
     return
+
 
 def purge_bucket(context, provider, **kwargs):
     """Delete objects in bucket."""
@@ -55,20 +58,20 @@ def purge_bucket(context, provider, **kwargs):
             session.client('cloudformation').describe_stacks(
                 StackName=context.get_fqn(value.split('::')[0])
             )
+
         except ClientError as exc:
             if 'does not exist' in exc.response['Error']['Message']:
                 LOGGER.info('S3 bucket stack appears to have already been '
                             'deleted...')
                 return True
             raise
-    #import pdb; pdb.set_trace()
-    #print(provider)
-
-    bucket_name = handler(
-        value,
-        provider=provider,
-        context=context
-    )
+        bucket_name = handler(
+            value,
+            provider=provider,
+            context=context
+        )
+    # import pdb; pdb.set_trace()
+    # print(provider)
 
     s3_resource = session.resource('s3')
     try:
