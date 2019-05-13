@@ -1,4 +1,10 @@
-"""Stacker hook for cleaning up resources prior to CFN stack deletion."""
+"""Stacker hook for cleaning up resources prior to CFN stack deletion.
+  - path: stacker_custom.destroy_hooks.cleanup_s3.purge_bucket
+    required: true
+    args:
+      bucket_name: ${namespace}-es-bucket
+# use bucket_name in the stacker yml when the bucket name does not need to be looked up
+"""
 
 import logging
 
