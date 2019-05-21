@@ -5,7 +5,7 @@ import uuid
 import zipfile
 import boto3
 import botocore
-
+import re
 import boto3
 
 
@@ -30,3 +30,8 @@ class IamHelpers():
             return True
         else:
             return False
+
+    def split_role_arn(self, arn):
+        account_id = arn.split(":")[4]
+        role_name = re.sub(r"^role/", "/", arn.split(":")[5], 1)
+        return account_id, role_name
