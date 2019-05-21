@@ -10,7 +10,7 @@ for package in packages:
 final = static + final_packages
 setup(
     name='newport_helpers',
-    version='0.1dev',
+    version='0.101dev',
     packages=final,
     license='Creative Commons Attribution-Noncommercial-Share Alike license',
     long_description=open('README.txt').read(),
