@@ -76,7 +76,7 @@ def handler(context, provider, **kwargs):
     # value = read_value_from_path(value)
 
     # helpers.print_separator('Looking up CloudTrail')
-    helpers.print_separator('Deploying CloudTrail')
+    Helpers.print_separator('Deploying CloudTrail')
     print(f"11/20/2018, Start Trail with Org Trail Property is not available in CFN"
           f"https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-cloudtrail-trail.html")
 
@@ -98,11 +98,11 @@ def handler(context, provider, **kwargs):
 
     trail_kwargs = dict(
         Name=trail_name,
-        S3BucketName=helpers.get_stack_output(cfn=cfn, stack_name=STACK_NAME, output='S3BucketName'),
+        S3BucketName=Cfn_helpers.get_stack_output(cfn=cfn, stack_name=STACK_NAME, output='S3BucketName'),
         IncludeGlobalServiceEvents=True,
         IsMultiRegionTrail=True,
         EnableLogFileValidation=True,
-        KmsKeyId=helpers.get_stack_output(cfn=cfn, stack_name=STACK_NAME, output='KMSKey'),
+        KmsKeyId=Cfn_helpers.get_stack_output(cfn=cfn, stack_name=STACK_NAME, output='KMSKey'),
         IsOrganizationTrail=True)
     print(f"Trail Kwargs: {trail_kwargs}")
     try:
