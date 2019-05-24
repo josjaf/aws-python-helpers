@@ -19,7 +19,8 @@ setup(
     install_requires=[
         'boto3>=1.9.134',
         'botocore>=1.12.134',
-        'jmespath>= 0.9.4'
+        'jmespath>= 0.9.4',
+        'GitPython>=2.1.11'
     ],
     # url='https://gitlab.com/josjaf/newport_helpers/',
 )
