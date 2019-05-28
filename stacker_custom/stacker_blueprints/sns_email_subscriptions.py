@@ -10,11 +10,11 @@ class SNSEmailSubscriptions(Blueprint):
     VARIABLES = {
         "TopicArn": {
             "type": str,
-            "description": "Dictionary of SNS Topic definitions",
+            "description": "SNS Topic Arn",
         },
         "Emails": {
             "type": list,
-            "description": "Dictionary of SNS Topic definitions",
+            "description": "List of emails to create individual objects for",
         }
     }
 
