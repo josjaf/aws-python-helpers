@@ -8,6 +8,7 @@ for package in packages:
     if '__pycache__' in package: continue
     final_packages.append(package)
 final = static + final_packages
+final.append('newport_helpers/wrap')
 setup(
     name='newport_helpers',
     version='0.101dev',
