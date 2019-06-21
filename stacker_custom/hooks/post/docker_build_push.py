@@ -5,11 +5,8 @@ from stacker.lookups.handlers.rxref import RxrefLookup
 from stacker.lookups.handlers.xref import XrefLookup
 from stacker.session_cache import get_session
 
-
-
 from botocore.exceptions import ClientError
 from newport_helpers import helpers, cfn_helpers, docker_helpers
-
 
 import boto3
 import docker
@@ -21,8 +18,6 @@ from newport_helpers.super import super
 s = super.Super()
 
 LOGGER = logging.getLogger(__name__)
-
-
 
 
 def handler(context, provider, **kwargs):
@@ -54,16 +49,9 @@ def handler(context, provider, **kwargs):
     t = datetime.datetime.now()
     buildtime = t.strftime("%m-%d-%Y %H:%M:%S")
 
-    labels = {'Maintainer': 'josjaf', 'commit': sha, 'buildtime': buildtime}
+    labels = {'commit': sha, 'buildtime': buildtime}
     s.Docker_Helpers.docker_build_image(tag, docker_file, labels)
-    session = boto3.session.Session()
-    s.Docker_Helpers.ecr_push(session=session,tag=tag)
-
-
-
-
-
-
+    s.Docker_Helpers.ecr_push(session=session, tag=tag, ecr_name=ecr_name)
 
     return labels
 
