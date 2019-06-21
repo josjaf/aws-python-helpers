@@ -58,9 +58,10 @@ class CloudFrontDistributionS3(Blueprint):
                     ),
                     ViewerProtocolPolicy="allow-all"),
                 Enabled=True,
-                HttpVersion='http2',
+                HttpVersion='http1.1',
                 PriceClass='PriceClass_100',
                 DefaultRootObject='index.html',
+                IPV6Enabled=False
 
             )
         )

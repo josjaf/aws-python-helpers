@@ -1,6 +1,9 @@
+import os
 import datetime
 import git
+
 import docker
+from base64 import b64decode
 
 
 class DockerHelpers():
@@ -8,6 +11,13 @@ class DockerHelpers():
         return
 
     def docker_build_image(self, tag, docker_file, labels):
+        """
+        build docker image locally
+        :param tag:
+        :param docker_file:
+        :param labels:
+        :return:
+        """
         docker_client = docker.from_env()
 
         t = datetime.datetime.now()
@@ -23,4 +33,36 @@ class DockerHelpers():
         print(f"Rebuilding the container took: {container_build_time}")
         print("$ docker run example")
 
+        return
+    def ecr_push(self, session, tag, ecrid):
+        """
+        push local docker imagae to ecr
+        :param session:
+        :param tag:
+        :return:
+        """
+        region = session.region_name
+        identity = session.client("sts").get_caller_identity()
+        account_id = identity['Account']
+        registry = f"{account_id}.dkr.ecr.{region}.amazonaws.com/{ecrid}"
+
+        # tag image
+        docker_client = docker.from_env()
+        image = docker_client.images.get(f'{tag}:latest')
+        image.tag(registry, 'latest')
+
+        # login
+        ecr = session.client('ecr', region_name=session.region_name)
+        login_response = ecr.get_authorization_token()
+        token = b64decode(login_response['authorizationData'][0]['authorizationToken']).decode()
+        username, password = token.split(':', 1)
+        print(username, password)
+        print(f"UserName: {username}")
+        print(f"Password: {password}")
+        response = docker_client.login(username=username, password=password, registry=registry, reauth=True, email=None)
+        print(response)
+        # changing latest to docker
+        response = docker_client.images.push(registry, tag=tag,
+                                             auth_config=dict(username=username, password=password))
+        print(response)
         return
