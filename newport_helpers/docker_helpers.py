@@ -34,22 +34,23 @@ class DockerHelpers():
         print("$ docker run example")
 
         return
-    def ecr_push(self, session, tag, ecrid):
+    def ecr_push(self, session, tag, ecr_name):
         """
         push local docker imagae to ecr
         :param session:
         :param tag:
+        :param ecr_name:
         :return:
         """
         region = session.region_name
         identity = session.client("sts").get_caller_identity()
         account_id = identity['Account']
-        registry = f"{account_id}.dkr.ecr.{region}.amazonaws.com/{ecrid}"
+        registry = f"{account_id}.dkr.ecr.{region}.amazonaws.com/{ecr_name}"
 
         # tag image
         docker_client = docker.from_env()
         image = docker_client.images.get(f'{tag}:latest')
-        image.tag(registry, 'latest')
+        image.tag(registry, tag)
 
         # login
         ecr = session.client('ecr', region_name=session.region_name)

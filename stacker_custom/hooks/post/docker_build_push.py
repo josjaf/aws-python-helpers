@@ -6,16 +6,15 @@ from stacker.lookups.handlers.xref import XrefLookup
 from stacker.session_cache import get_session
 
 from botocore.exceptions import ClientError
-from newport_helpers import helpers, cfn_helpers, docker_helpers
 
 import boto3
 import docker
 import datetime
 import git
 from base64 import b64decode
-from newport_helpers.super import super
+import newport_helpers
 
-s = super.Super()
+NPH = newport_helpers.NPH()
 
 LOGGER = logging.getLogger(__name__)
 
@@ -50,8 +49,8 @@ def handler(context, provider, **kwargs):
     buildtime = t.strftime("%m-%d-%Y %H:%M:%S")
 
     labels = {'commit': sha, 'buildtime': buildtime}
-    s.Docker_Helpers.docker_build_image(tag, docker_file, labels)
-    s.Docker_Helpers.ecr_push(session=session, tag=tag, ecr_name=ecr_name)
+    NPH.Docker_Helpers.docker_build_image(tag, docker_file, labels)
+    NPH.Docker_Helpers.ecr_push(session=session, tag=tag, ecr_name=ecr_name)
 
     return labels
 
