@@ -49,7 +49,12 @@ def handler(context, provider, **kwargs):
     buildtime = t.strftime("%m-%d-%Y %H:%M:%S")
 
     labels = {'commit': sha, 'buildtime': buildtime}
-    NPH.Docker_Helpers.docker_build_image(tag, docker_file, labels)
+    path = kwargs.get('path', '.')
+    build_kwargs = dict(tag=tag, docker_file=docker_file, labels=labels)
+    if path:
+        build_kwargs['path'] = path
+
+    NPH.Docker_Helpers.docker_build_image(**build_kwargs)
     NPH.Docker_Helpers.ecr_push(session=session, tag=tag, ecr_name=ecr_name)
 
     return labels
