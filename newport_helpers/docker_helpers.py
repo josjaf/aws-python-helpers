@@ -10,7 +10,8 @@ class DockerHelpers():
     def __init__(self, *args, **kwargs):
         return
 
-    def docker_build_image(self, tag, docker_file, labels):
+    def docker_build_image(self, tag, docker_file, labels, path='.'):
+        #TODO Determine whether change directory is required to the same dir as the dockerfile
         """
         build docker image locally
         :param tag:
@@ -28,7 +29,7 @@ class DockerHelpers():
         # TODO add exception processing for requests.exceptions.ConnectionError when docker dameon is not running
         buildtime = t.strftime("%m-%d-%Y %H:%M:%S")
 
-        response = docker_client.images.build(path='.', tag=tag, labels=labels, dockerfile=docker_file)
+        response = docker_client.images.build(path=path, tag=tag, labels=labels, dockerfile=docker_file)
         container_build_time = datetime.datetime.now() - t
         print(f"Rebuilding the container took: {container_build_time}")
         print("$ docker run example")
