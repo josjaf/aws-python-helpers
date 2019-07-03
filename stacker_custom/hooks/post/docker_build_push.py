@@ -1,10 +1,22 @@
+"""
+post_build:
+  push_image:
+    path: stacker_custom.hooks.post.docker_build_push.handler
+    required: true
+    args:
+      ecrid: ecr::ecrid
+      dockerfile: Dockerfile
+      path: app_pipeline
+      docker_tag: ${docker_stack_set_tag}
+
+"""
 import logging
 
 from stacker.lookups.handlers.output import OutputLookup
 from stacker.lookups.handlers.rxref import RxrefLookup
 from stacker.lookups.handlers.xref import XrefLookup
 from stacker.session_cache import get_session
-
+from stacker.logger import setup_logging
 from botocore.exceptions import ClientError
 
 import boto3
@@ -16,7 +28,7 @@ import newport_helpers
 
 NPH = newport_helpers.NPH()
 
-LOGGER = logging.getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 
 def handler(context, provider, **kwargs):
@@ -26,15 +38,15 @@ def handler(context, provider, **kwargs):
     stack_name = context.get_fqn(value.split('::')[0])
     docker_file = kwargs['dockerfile']
     tag = kwargs['docker_tag']
-    print(f"Looking up ECR ID from {stack_name}")
+    logger.info(f"Looking up ECR ID from {stack_name}")
     try:  # Exit early if the bucket's stack is already deleted
         session.client('cloudformation').describe_stacks(
             StackName=context.get_fqn(value.split('::')[0])
         )
 
-    except ClientError as exc:
-        if 'does not exist' in exc.response['Error']['Message']:
-            LOGGER.info('S3 bucket stack appears to have already been '
+    except ClientError as e:
+        if 'does not exist' in e.response['Error']['Message']:
+            logger.info('S3 bucket stack appears to have already been '
                         'deleted...')
             return True
         raise
@@ -48,7 +60,9 @@ def handler(context, provider, **kwargs):
     t = datetime.datetime.now()
     buildtime = t.strftime("%m-%d-%Y %H:%M:%S")
 
-    labels = {'commit': sha, 'buildtime': buildtime}
+    #labels = {'commit': sha, 'buildtime': buildtime}
+    # making labels blank to prevent many iterations of the same container with different labaels
+    labels = {}
     path = kwargs.get('path', '.')
     build_kwargs = dict(tag=tag, docker_file=docker_file, labels=labels)
     if path:
