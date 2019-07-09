@@ -64,7 +64,9 @@ class DockerHelpers():
         response = docker_client.login(username=username, password=password, registry=registry, reauth=True, email=None)
         print(response)
         # changing latest to docker
-        response = docker_client.images.push(registry, tag=tag,
-                                             auth_config=dict(username=username, password=password))
+        for line in docker_client.images.push(registry, tag=tag,stream=True, decode=True,
+                                              auth_config=dict(username=username, password=password)):
+            print(line)
+
         print(response)
         return
