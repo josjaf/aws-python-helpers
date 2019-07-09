@@ -71,7 +71,7 @@ def handler(context, provider, **kwargs):
     NPH.Docker_Helpers.docker_build_image(**build_kwargs)
     NPH.Docker_Helpers.ecr_push(session=session, tag=tag, ecr_name=ecr_name)
 
-    return labels
+    return build_kwargs
 
 
 if __name__ == '__main__':
