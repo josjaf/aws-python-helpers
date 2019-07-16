@@ -1,4 +1,4 @@
-from newport_helpers import helpers, docker_helpers, cfn_helpers, iam_helpers, org_helpers
+from newport_helpers import helpers, docker_helpers, cfn_helpers, iam_helpers, org_helpers, codebuild_helpers
 
 
 class NPH():
@@ -14,3 +14,4 @@ class NPH():
     Cfn_Helpers = cfn_helpers.CfnHelpers()
     Iam_Helpers = iam_helpers.IamHelpers()
     Org_Helpers = org_helpers.Organization_Helpers()
+    CodeBuild_Helpers = codebuild_helpers.CodeBuildHelpers()
