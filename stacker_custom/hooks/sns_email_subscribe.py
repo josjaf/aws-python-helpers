@@ -1,3 +1,6 @@
+"""
+this is make subscribe calls every time ir runs, suggest using a bluepprint to avoid writing extra logic to see if a subscription already exists before it gets created.
+"""
 from __future__ import print_function
 from __future__ import division
 from __future__ import absolute_import

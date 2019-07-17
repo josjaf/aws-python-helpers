@@ -267,6 +267,12 @@ class CfnHelpers():
         else:
             return False
     def stack_set_exists_check(self, session, stack_set_name):
+        """
+        check if a stack set already exists and return bool
+        :param session:
+        :param stack_set_name:
+        :return:
+        """
 
         # TODO Add Pagination
         cfn = session.client('cloudformation')
@@ -282,7 +288,13 @@ class CfnHelpers():
         else:
             return False
     def get_stack_output(self, session, stack_name, output):
-
+        """
+        get the output value from a stack
+        :param session:
+        :param stack_name:
+        :param output:
+        :return:
+        """
         cfn = session.client('cloudformation')
         response = cfn.describe_stacks()
         # print(f"Getting Output {output} from {stack_name}")
@@ -367,6 +379,12 @@ class CfnHelpers():
                     op_busy = False
         return
     def stack_set_waiter(self, session, stack_set_name):
+        """
+        Stack Set waiter, avoid operation in process exception. handle lock between stack set definition and instances
+        :param session:
+        :param stack_set_name:
+        :return:
+        """
         cfn = session.client('cloudformation')
         # DEBUG
         #inprogress_operations.append({'OperationId': 'eb2b441e-564f-11e9-b959-0242ac110002', 'Action': 'CREATE', 'Status': 'RUNNING'})

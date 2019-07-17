@@ -7,6 +7,12 @@ class CodeBuildHelpers():
         return
 
     def codebuild_job_waiter(self, session, buildId):
+        """
+        wait for a codebuild job to complete
+        :param session:
+        :param buildId:
+        :return:
+        """
         cb = session.client('codebuild')
         buildSucceeded = False
         counter = 0
@@ -27,4 +33,4 @@ class CodeBuildHelpers():
             elif buildStatus == 'FAILED' or buildStatus == 'FAULT' or buildStatus == 'STOPPED' or buildStatus == 'TIMED_OUT':
                 print(f"CodeBuild BuildId: {buildId} status: {buildStatus}")
                 break
-        return
+        return buildStatus

@@ -41,11 +41,7 @@ def handler(context, provider, **kwargs):
         )
 
     except ClientError as e:
-        if 'does not exist' in e.response['Error']['Message']:
-            logger.info('S3 bucket stack appears to have already been '
-                        'deleted...')
-            return True
-        raise
+        raise e
     projectName = handler(
         value,
         provider=provider,
@@ -59,9 +55,9 @@ def handler(context, provider, **kwargs):
     buildId = response['build']['id']
     NPH = newport_helpers.NPH()
 
-    NPH.CodeBuild_Helpers.codebuild_job_waiter(session, buildId)
-
-    return response
+    buildStatus = NPH.CodeBuild_Helpers.codebuild_job_waiter(session, buildId)
+    hook_return = {'buildStatus': buildStatus}
+    return hook_return
 
 
 if __name__ == '__main__':

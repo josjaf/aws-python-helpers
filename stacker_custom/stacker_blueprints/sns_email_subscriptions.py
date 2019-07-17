@@ -1,3 +1,6 @@
+"""
+Create SNS Subscription for a give topic with a variable length of subscriptions to create, better than making api calls
+"""
 from stacker.blueprints.base import Blueprint
 from troposphere.sns import SubscriptionResource, Topic
 
