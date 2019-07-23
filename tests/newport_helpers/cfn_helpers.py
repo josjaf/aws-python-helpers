@@ -2,8 +2,9 @@ import sys
 import unittest
 import newport_helpers
 import moto
-#import boto3
+# import boto3
 import botocore.exceptions
+
 try:
     from unittest.mock import MagicMock, patch, ANY
 except ImportError:
@@ -18,6 +19,7 @@ CONFIG_CLIENT_MOCK = MagicMock()
 STS_CLIENT_MOCK = MagicMock()
 STS_SESSION_MOCK = MagicMock()
 REGION = None
+
 
 class Boto3Mock():
     @staticmethod
@@ -36,6 +38,7 @@ class Boto3Mock():
 
         return STS_SESSION_MOCK
 
+
 sys.modules['boto3'] = Boto3Mock()
 
 
@@ -48,15 +51,10 @@ class HelpersTest(unittest.TestCase):
         self.Code = CfnHelpers
 
     def test_dict_to_cfn_parameters(self):
-
-
         mocked_dict = {'App': 'Newport', 'Type': 'Helpers'}
-        processed_list = [{'ParameterKey': 'App', 'ParameterValue': 'Newport'}, {'ParameterKey': 'Type', 'ParameterValue': 'Helpers'}]
-        self.rule.dict_to_cfn_parameters = MagicMock(return_value=processed_list)
-        #response = self.rule.dict_to_cfn_parameters(mocked_dict)
-        response = self.rule.dict_to_cfn_parameters(mocked_dict)
-        # check for delete response
-        #response['HTTPStatusCode'] = 204
+        processed_list = [{'ParameterKey': 'App', 'ParameterValue': 'Newport'},
+                          {'ParameterKey': 'Type', 'ParameterValue': 'Helpers'}]
+        response = self.rule.dict_to_cfn_parameters(self, mocked_dict)
         self.assertEqual(response, processed_list)
 
     # def test_check_stack_set_exists(self):
