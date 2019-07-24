@@ -96,3 +96,33 @@ class DockerHelpers():
 
         print(response)
         return
+
+
+    def run_docker(self, environment_variables, image_name, container_name):
+
+        docker_client = docker.from_env()
+        self.docker_running_check(docker_client)
+        try:
+            container = docker_client.containers.get(container_id=container_name)
+            container.remove()
+        except docker.errors.NotFound:
+            pass
+        except Exception as e:
+            print(e)
+            raise e
+
+        print(f"Creating Docker Container {container_name} from image: {image_name}")
+        # mounts = {os.getcwd(): {'bind': '/trident', 'mode': 'rw'}}
+
+        environment_variables = environment_variables
+        print(f"env: {environment_variables}")
+        docker_client.containers.run("example", detach=True,
+                                     environment=environment_variables,
+                                     name=container_name,
+                                     log_config={"type": "json-file",
+                                                 "config": {"max-size": "1m"}}
+
+                                     )
+        print(f"docker logs -f {container_name}")
+
+        return

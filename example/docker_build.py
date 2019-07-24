@@ -43,8 +43,8 @@ def main():
     # making labels blank to prevent many iterations of the same container with different labaels
     labels = {}
     path = '.'
-    tag = 'latest'
-    docker_file = 'example/Dockerfile'
+    tag = 'newport-helpers'
+    docker_file = 'Dockerfile'
     build_kwargs = dict(tag=tag, docker_file=docker_file, labels=labels, path=path)
 
 
