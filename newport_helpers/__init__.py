@@ -1,4 +1,4 @@
-from newport_helpers import helpers, docker_helpers, cfn_helpers, iam_helpers, org_helpers, codebuild_helpers
+from newport_helpers import helpers, docker_helpers, cfn_helpers, iam_helpers, org_helpers, codebuild_helpers, aws_credential_helpers
 
 
 class NPH():
@@ -15,3 +15,4 @@ class NPH():
     Iam_Helpers = iam_helpers.IamHelpers()
     Org_Helpers = org_helpers.Organization_Helpers()
     CodeBuild_Helpers = codebuild_helpers.CodeBuildHelpers()
+    AWSCredentialHelpers = aws_credential_helpers.AWSCredentialHelpers()
