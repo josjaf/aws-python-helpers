@@ -76,6 +76,7 @@ class CfnHelpers():
             return True
         else:
             return False
+
     def cloudformation_waiter(self, client, waiter, stack_name):
         now = datetime.datetime.now()
 

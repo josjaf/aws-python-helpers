@@ -2,11 +2,13 @@ import os
 import uuid
 import zipfile
 import botocore
-
+import logging
 import boto3
 
 
 class Helpers():
+
+
     def __init__(self, *args, **kwargs):
         return
 
@@ -91,12 +93,7 @@ class Helpers():
 
         return
 
-    def file_to_string(self, file):
-        with open(file, 'r') as myfile:
-            file_str = myfile.read()
-        myfile.close()
 
-        return file_str
 
     def dict_to_env_variables(self, dictionary):
         """

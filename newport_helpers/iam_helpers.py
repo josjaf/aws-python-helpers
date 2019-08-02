@@ -35,3 +35,5 @@ class IamHelpers():
         account_id = arn.split(":")[4]
         role_name = re.sub(r"^role/", "/", arn.split(":")[5], 1)
         return account_id, role_name
+
+

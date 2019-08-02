@@ -4,6 +4,13 @@ class StringFileHelpers():
         return
 
     def string_md5_compare(self, string1, string2):
+        #TODO why would you use this instead of ==? Maybe ssh keys or something like that
+        """
+        compare the md5 of two strings
+        :param string1: 
+        :param string2: 
+        :return: 
+        """
         test1 = hashlib.md5(string1.encode('utf-8')).hexdigest()
         test2 = hashlib.md5(string2.encode('utf-8')).hexdigest()
         assert test1 == test2
@@ -18,6 +25,12 @@ class StringFileHelpers():
 
         return file_str
     def compare_md5_file(self, file1_path, file2_path):
+        """
+        compare the md5 of two files
+        :param file1_path: 
+        :param file2_path: 
+        :return: 
+        """
         md5_1 = (self.file_to_string(file1_path)).encode()
 
         md5_2 = (self.file_to_string(file2_path)).encode()
