@@ -57,14 +57,21 @@ class HelpersTest(unittest.TestCase):
         response = self.rule.dict_to_cfn_parameters(self, mocked_dict)
         self.assertEqual(response, processed_list)
 
-    # def test_check_stack_set_exists(self):
-    #
-    #
-    #     mocked_session = Boto3Mock.Session()
-    #     self.rule.cfn_check_stack_exists = MagicMock(return_value=True)
-    #     response = self.rule.cfn_check_stack_exists(session=mocked_session, stack_name='test')
-    #     self.assertEqual(response, True)
+    def test_check_stack_set_exists(self):
 
+
+        mocked_session = Boto3Mock.Session()
+        self.rule.cfn_check_stack_exists = MagicMock(return_value=True)
+        response = self.rule.cfn_check_stack_exists(session=mocked_session, stack_name='test')
+        self.assertEqual(response, True)
+    def test_create_update_stack(self):
+
+
+        mocked_session = Boto3Mock.Session()
+        args = {'StackName': 'Newport-Mock'}
+        self.rule.cfn_check_stack_exists = MagicMock(return_value=True)
+        response = self.rule.cfn_check_stack_exists(session=mocked_session, stack_name='test')
+        self.assertEqual(response, True)
 
 if __name__ == "__main__":
     unittest.main()
