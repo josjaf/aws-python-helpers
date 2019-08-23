@@ -149,13 +149,16 @@ class CfnHelpers():
 
         print(f"Stack: {stack_name} took {diff.seconds} seconds")
         return status
-    def create_update_stack(self, session, args):
+    def create_update_stack(self, session, args: dict):
         """
         Wrapper for create update stack
         :param cloudformation_client:
         :param args:
         :return:
+        args = {'StackName': stack_name, 'Capabilities': ['CAPABILITY_IAM', 'CAPABILITY_NAMED_IAM'],
+                     'TemplateBody': 'ABC}
         """
+
         cloudformation_client = session.client('cloudformation')
         print("Stack: {} : Creating or Updating in Region: {}".format(args['StackName'], cloudformation_client.meta.region_name))
         stack_exists = self.cfn_check_stack_exists(session, args['StackName'])
