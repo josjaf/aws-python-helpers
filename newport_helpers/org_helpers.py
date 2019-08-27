@@ -1,6 +1,6 @@
 import boto3
 from newport_helpers import helpers
-
+import threading
 Helpers = helpers.Helpers()
 
 
@@ -60,3 +60,46 @@ class Organization_Helpers():
             yield account, session
 
 
+    def org_loop_entry_thread(self, org_profile=None, account_role=None):
+        """
+        returns a list of tuples with the account id and the child session
+        :param org_profile:
+        :param account_role:
+        :return:
+        """
+        session_args = {}
+        if org_profile:
+            session_args['profile_name'] = org_profile
+        if not account_role:
+            account_role = 'OrganizationAccountAccessRole'
+        session = boto3.session.Session(**session_args)
+        threads = []
+        results = []
+
+        def worker(account, session, results):
+
+            session = Helpers.get_child_session(account, account_role, None)
+            response = (account,session)
+            results.append(response)
+
+        org_accounts = self.get_org_accounts(session)
+        print(len(org_accounts))
+        for account in org_accounts:
+            t = threading.Thread(target=worker, args=(account, session, results))
+            threads.append(t)
+            print(f"Account {account}" )
+            t.start()
+
+        print(len(threads))
+        for thread in threads:
+            thread.join()
+        print(results)
+        return results
+
+
+
+if __name__ == '__main__':
+    Organization_Helpers = Organization_Helpers()
+
+    results = Organization_Helpers.org_loop_entry_thread()
+    print(results)
