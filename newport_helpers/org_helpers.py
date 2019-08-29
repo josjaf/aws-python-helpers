@@ -60,7 +60,7 @@ class Organization_Helpers():
             yield account, session
 
 
-    def org_loop_entry_thread(self, org_profile=None, account_role=None):
+    def org_loop_entry_thread(self, org_profile=None, account_role=None, remove_org_master=False):
         """
         returns a list of tuples with the account id and the child session
         :param org_profile:
@@ -82,7 +82,7 @@ class Organization_Helpers():
             response = (account,session)
             results.append(response)
 
-        org_accounts = self.get_org_accounts(session)
+        org_accounts = self.get_org_accounts(session, remove_org_master)
         print(len(org_accounts))
         for account in org_accounts:
             t = threading.Thread(target=worker, args=(account, session, results))
