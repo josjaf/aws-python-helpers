@@ -25,8 +25,9 @@ import datetime
 import git
 from base64 import b64decode
 import newport_helpers
+import newport_helpers.NPH
 
-NPH = newport_helpers.NPH()
+NPH = newport_helpers.NPH.NPH()
 
 logger = logging.getLogger(__name__)
 
