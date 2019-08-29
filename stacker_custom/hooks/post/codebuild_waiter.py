@@ -22,10 +22,9 @@ import docker
 import datetime
 import git
 from base64 import b64decode
-import newport_helpers
-import newport_helpers.NPH
+from newport_helpers import NPH
 
-NPH = newport_helpers.NPH.NPH()
+NPH = NPH.NPH()
 
 logger = logging.getLogger(__name__)
 
@@ -54,7 +53,7 @@ def handler(context, provider, **kwargs):
     response = cb.start_build(projectName=projectName)
 
     buildId = response['build']['id']
-    NPH = newport_helpers.NPH.NPH()
+
 
     buildStatus = NPH.CodeBuild_Helpers.codebuild_job_waiter(session, buildId)
     hook_return = {'buildStatus': buildStatus}
