@@ -84,9 +84,9 @@ class DockerHelpers():
         login_response = ecr.get_authorization_token()
         token = b64decode(login_response['authorizationData'][0]['authorizationToken']).decode()
         username, password = token.split(':', 1)
-        print(username, password)
-        print(f"UserName: {username}")
-        print(f"Password: {password}")
+        # print(username, password)
+        # print(f"UserName: {username}")
+        # print(f"Password: {password}")
         response = docker_client.login(username=username, password=password, registry=registry, reauth=True, email=None)
         print(response)
         # changing latest to docker
@@ -98,7 +98,7 @@ class DockerHelpers():
         return
 
 
-    def run_docker(self, environment_variables, image_name, container_name):
+    def run_docker(self, environment_variables, image_name, container_name, command=None):
 
         docker_client = docker.from_env()
         self.docker_running_check(docker_client)
@@ -116,7 +116,7 @@ class DockerHelpers():
 
         environment_variables = environment_variables
         print(f"env: {environment_variables}")
-        docker_client.containers.run("example", detach=True,
+        docker_client.containers.run("example", command=command, detach=True,
                                      environment=environment_variables,
                                      name=container_name,
                                      log_config={"type": "json-file",

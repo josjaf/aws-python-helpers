@@ -59,6 +59,11 @@ class Organization_Helpers():
             session = Helpers.get_child_session(account, account_role, None)
             yield account, session
 
+    def org_loop_entry_thread_worker(self, account, account_role, session, results):
+
+        session = Helpers.get_child_session(account, account_role, session)
+        response = (account,session)
+        results.append(response)
 
     def org_loop_entry_thread(self, org_profile=None, account_role=None, remove_org_master=False):
         """
@@ -85,7 +90,9 @@ class Organization_Helpers():
         org_accounts = self.get_org_accounts(session, remove_org_master)
         print(len(org_accounts))
         for account in org_accounts:
-            t = threading.Thread(target=worker, args=(account, session, results))
+            t = threading.Thread(target=self.org_loop_entry_thread_worker,
+                                 args=(account, account_role, session, results))
+            #t = threading.Thread(target=worker, args=(account, session, results))
             threads.append(t)
             print(f"Account {account}" )
             t.start()
