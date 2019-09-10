@@ -93,11 +93,6 @@ class SecretsManagerHelpers():
         print()
         return
 
-    def get_parameter_startswith(self, session, parameter_name):
-        ssm = session.client('ssm')
-        response = ssm.describe_parameters()
-        parameter_names = [p['Name'] for p in response['Parameters'] if p['Name'].startswith(parameter_name)]
-        return parameter_names
 
     def put_secret_chunks(self, file_path, session, namespace):
         """
@@ -205,17 +200,3 @@ class SecretsManagerHelpers():
         secret_startswith = [secret for secret in all_secrets if secret.startswith(secret_name)]
         return secret_startswith
 
-
-def write_string_to_file(string, file):
-    with open(file, 'w') as f:
-        f.write(string)
-        f.close()
-    print("Writing to file: {}".format(file))
-    return
-
-
-def file_to_string(file_path):
-    with open(file_path, 'r') as f:
-        file_str = f.read()
-        f.close()
-    return file_str
