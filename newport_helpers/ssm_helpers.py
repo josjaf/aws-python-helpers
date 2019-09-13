@@ -2,11 +2,19 @@ import time
 import boto3
 import botocore
 
+
 class SSMHelpers():
     def __init__(self, *args, **kwargs):
         return
 
     def command_waiter(self, session, command_id, instance_id):
+        """
+        Wait for an ssm command to hit the finished status
+        :param session:
+        :param command_id:
+        :param instance_id:
+        :return:
+        """
         counter = 0
         ssm = session.client('ssm')
         finished_status = ['Delayed', 'Failed', 'Canceled', 'Success']
@@ -21,16 +29,38 @@ class SSMHelpers():
         return
 
     def get_parameter_startswith(self, session, parameter_name):
+        """
+        :param session:
+        :param parameter_name:
+        :return:
+        """
         ssm = session.client('ssm')
-        response = ssm.describe_parameters()
+        response = {}
+        response['Parameters'] = []
+        paginator = ssm.get_paginator('describe_parameters')
+        response_iterator = paginator.paginate()
+
+        for page in response_iterator:
+            for s in page['Parameters']:
+                response['Parameters'].append(s)
+
+        # response = ssm.describe_parameters()
         parameter_names = [p['Name'] for p in response['Parameters'] if p['Name'].startswith(parameter_name)]
         return parameter_names
 
-    def get_parameter(self, paremeter_name, session):
+    def get_parameter(self, session, parameter_name):
+        """
+        Get a parameter, if it doesn't exist, catch the exception and return None
+        Return the dict response and the value in a tuple
+        :param session:
+        :param parameter_name:
+        :return:
+        """
         try:
+            print(f"Getting Parameter: {parameter_name}")
             ssm = session.client('ssm')
             response = ssm.get_parameter(
-                Name=paremeter_name,
+                Name=parameter_name,
             )
         except botocore.exceptions.ClientError as e:
             if e.response['Error']['Code'] == 'ParameterNotFound':
@@ -38,4 +68,4 @@ class SSMHelpers():
         except Exception as e:
             raise e
 
-        return response
+        return response, response['Parameter']['Value']
