@@ -1,5 +1,5 @@
 """
-Create SNS Subscription for a give topic with a variable length of subscriptions to create, better than making api calls
+Create ECR Repo for a give topic with a variable length of account roots
 """
 from stacker.blueprints.base import Blueprint
 from troposphere.sns import SubscriptionResource, Topic
@@ -12,7 +12,7 @@ from troposphere import Tags
 
 class ECRMultiAccountTrust(Blueprint):
     """
-    Manages the creation of SNS email subscriptions.
+    Mutli Account ECR
     """
 
     VARIABLES = {
