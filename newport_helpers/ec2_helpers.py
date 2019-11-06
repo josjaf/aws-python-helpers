@@ -25,3 +25,4 @@ class EC2Helpers():
         return availability_zones
 
     # TODO
+    
