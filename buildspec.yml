@@ -2,11 +2,11 @@ version: 0.2
 
 phases:
   install:
-    install:
-      runtime-versions:
-        python: 3.6
-      commands:
-        - pip3 install awscli
+
+    runtime-versions:
+      python: 3.6
+    commands:
+      - pip3 install awscli
   pre_build:
     commands:
       - echo logging into docker
