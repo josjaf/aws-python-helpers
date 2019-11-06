@@ -4,7 +4,7 @@ class EC2Helpers():
     def __init__(self, *args, **kwargs):
         return
 
-    def get_service_azs(self, session, service_name):
+    def get_endpoint_service_az(self, session, service_name):
         """
         get the azs for a specific service
         :param session:
