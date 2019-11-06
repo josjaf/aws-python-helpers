@@ -1,0 +1,17 @@
+image: "python:3.7"
+
+before_script:
+  - apt-get update && apt-get upgrade -y
+  - apt-get install zip -y
+  - python --version
+  - which python
+  - pip3 install awscli aws-sam-cli
+
+s3upload:
+  script:
+    - zip -r source.zip .
+    - aws s3 cp source.zip s3://${S3_BUCKET}/source/newport_helpers.zip
+
+#rubocop:
+#  script:
+#    - bundle exec rubocop
