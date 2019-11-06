@@ -1,0 +1,12 @@
+version: 0.2
+
+phases:
+  pre_build:
+    commands:
+      - echo logging into docker
+  build:
+    commands:
+      - echo Entered the post_build phase...
+      - ls -lha
+      - pip install newport_helpers
+      - echo Build completed on `date`
