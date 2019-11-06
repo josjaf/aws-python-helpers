@@ -1,6 +1,12 @@
 version: 0.2
 
 phases:
+  install:
+    install:
+      runtime-versions:
+        python: 3.6
+      commands:
+        - pip3 install awscli
   pre_build:
     commands:
       - echo logging into docker
@@ -8,5 +14,8 @@ phases:
     commands:
       - echo Entered the post_build phase...
       - ls -lha
-      - pip install newport_helpers
+      - pip install .
+      - pip install moto
+      - python tests/newport_helpers/cfn_helpers.py
+      - python tests/newport_helpers/helpers.py
       - echo Build completed on `date`
