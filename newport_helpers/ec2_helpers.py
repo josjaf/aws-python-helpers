@@ -23,3 +23,6 @@ class EC2Helpers():
         availability_zones = sorted(endpoint_config['AvailabilityZones'])
 
         return availability_zones
+
+    # TODO
+    
