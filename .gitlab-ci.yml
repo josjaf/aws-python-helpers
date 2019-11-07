@@ -5,11 +5,12 @@ before_script:
   - apt-get install zip -y
   - python --version
   - which python
-  - pip3 install awscli aws-sam-cli
+  - pip3 install awscli
 
 s3upload:
   script:
     - zip -r source.zip .
+
     - aws s3 cp source.zip s3://${S3_BUCKET}/source/newport_helpers.zip
 
 #rubocop:
