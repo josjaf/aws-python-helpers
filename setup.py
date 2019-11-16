@@ -3,7 +3,7 @@ import glob
 
 setup(
     name='newport_helpers',
-    version='0.102',
+    version='0.103',
     packages=['stacker_custom', 'newport_helpers/', 'stacker_custom/destroy_hooks', 'stacker_custom/hooks',
               'stacker_custom/lookups', 'stacker_custom/hooks/post', 'stacker_custom/stacker_blueprints',
               ],
