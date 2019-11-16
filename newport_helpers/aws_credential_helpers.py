@@ -11,6 +11,10 @@ class AWSCredentialHelpers():
         return
 
     def get_credentials(self):
+        """
+        get credentials dictionary from boto3, can be used to pass into docker container not running onaws
+        :return:
+        """
         credentials = {}
         available_profiles = boto3.session.Session().available_profiles
 
