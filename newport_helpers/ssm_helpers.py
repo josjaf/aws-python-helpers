@@ -28,10 +28,11 @@ class SSMHelpers():
             time.sleep(10)
         return
 
-    def get_parameter_startswith(self, session, parameter_name):
+    def get_parameters(self, session):
         """
+        get all the parameters using the paginator, but returns the same response structure as if we used the next token
+        response['Parameters']
         :param session:
-        :param parameter_name:
         :return:
         """
         ssm = session.client('ssm')
@@ -43,6 +44,16 @@ class SSMHelpers():
         for page in response_iterator:
             for s in page['Parameters']:
                 response['Parameters'].append(s)
+
+        return response
+
+    def get_parameter_startswith(self, session, parameter_name):
+        """
+        :param session:
+        :param parameter_name:
+        :return:
+        """
+        response = self.get_parameters(session)
 
         # response = ssm.describe_parameters()
         parameter_names = [p['Name'] for p in response['Parameters'] if p['Name'].startswith(parameter_name)]
@@ -69,3 +80,12 @@ class SSMHelpers():
             raise e
 
         return response, response['Parameter']['Value']
+
+
+if __name__ == '__main__':
+    session = boto3.session.Session()
+    SSMHelpers = SSMHelpers()
+    response = SSMHelpers.get_parameters(session)
+    print(response)
+    params = SSMHelpers.get_parameter_startswith(session, '/')
+    print(params)
