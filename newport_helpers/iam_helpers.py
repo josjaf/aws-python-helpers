@@ -36,4 +36,16 @@ class IamHelpers():
         role_name = re.sub(r"^role/", "/", arn.split(":")[5], 1)
         return account_id, role_name
 
+    def sts_to_iam_arn(self, session):
+        sts = session.client('sts')
+        response_arn = sts.get_caller_identity()['Arn']
+        # TODO FIX blank
 
+        if ':user/' not in response_arn:
+            if 'assumed-role' in response_arn:  # might mean there is a session
+                response_arn = response_arn.replace("arn:aws:sts", "arn:aws:iam")
+                response_arn = response_arn.replace("assumed-role", "role")
+                constructed_arn = response_arn.rsplit("/", 1)[0]
+            return constructed_arn
+        else:
+            return response_arn
