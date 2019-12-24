@@ -8,7 +8,6 @@ import boto3
 
 class Helpers():
 
-
     def __init__(self, *args, **kwargs):
         return
 
@@ -75,25 +74,6 @@ class Helpers():
             file_str = f.read()
             f.close()
         return file_str
-
-    def org_id_parameter_add(self, session):
-        try:
-            organizations = session.client('organizations')
-            response = organizations.describe_organization()
-
-            principal_org_id = response['Organization']['Id']
-
-            params = {"PrincipalOrgID": principal_org_id}
-            return principal_org_id
-
-        except botocore.exceptions.ClientError as e:
-            if e.response['Error']['Code'] == 'AWSOrganizationsNotInUseException':
-                print("#" * 75)
-                raise RuntimeError("CREATE A NEW ORGANIZATION IN ACCOUNT OR JOIN TO CONTINUE")
-
-        return
-
-
 
     def dict_to_env_variables(self, dictionary):
         """
@@ -184,5 +164,3 @@ class Helpers():
         # switch back to original working directory
         os.chdir(original_dir)
         return
-
-
