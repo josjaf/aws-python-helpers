@@ -305,7 +305,7 @@ class CfnHelpers():
         try:
             stack = [s for s in response['Stacks'] if s['StackName'] == stack_name][0]
         except IndexError:
-            raise Exception(f"Stack Name {stack_name} for output does not exist")
+            raise Exception(f"Stack Name {stack_name} does not exist")
         # print(f"response: {stack}")
         if 'Outputs' not in stack:
             print(f"Outputs not found in {stack_name}")
@@ -409,6 +409,7 @@ class CfnHelpers():
             if len(inprogress_operations) == 0: # Are you SURE there are no stack set operations running
                 return "No StackSets to wait on"
             else:
+                # This is the edge case where the operation is not immediately registered in the API
                 print(f"STACK SET API RETURNED 0, WAITED {(5*poll_count)}s, NOW THERE IS AN OPERATION!!")
         for operation in inprogress_operations:
             running = True

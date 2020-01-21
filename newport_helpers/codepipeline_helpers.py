@@ -6,7 +6,9 @@ import zipfile
 import botocore
 import boto3
 
-
+"""
+Codepipeline helpers for when Codepipeline invokes a Lambda
+"""
 def stack_exists(stack):
     """Check if a stack exists or not
 
@@ -49,6 +51,21 @@ def put_job_success(job, message):
     code_pipeline = boto3.client('codepipeline')
     code_pipeline.put_job_success_result(jobId=job)
 
+def put_job_failure_from_event(event, message=None):
+    """
+    Put a job failure from an event
+    :param event:
+    :return:
+    """
+
+    # Extract the Job ID
+    job_id = event['CodePipeline.job']['id']
+    # Extract the Job Data
+    job_data = event['CodePipeline.job']['data']
+    if not message:
+        message = 'GenericFailureMessage'
+    put_job_failure(job_id, message)
+    return
 
 def put_job_failure(job, message):
     """Notify CodePipeline of a failed job
