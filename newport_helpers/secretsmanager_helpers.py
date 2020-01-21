@@ -93,7 +93,6 @@ class SecretsManagerHelpers():
         print()
         return
 
-
     def put_secret_chunks(self, file_path, session, namespace):
         """
         Get the Total Size of the parameters.
@@ -200,3 +199,31 @@ class SecretsManagerHelpers():
         secret_startswith = [secret for secret in all_secrets if secret.startswith(secret_name)]
         return secret_startswith
 
+    def check_secret_status(self, session, secret_name):
+        """
+
+        :param session:
+        :param secret_name:
+        :return:
+        """
+        deleted = 'DELETED'
+        active = 'ACTIVE'
+        new = 'NEW'
+
+        asm = session.client('asm')
+        try:
+            response = asm.describe_secret(SecretId=secret_name)
+
+            if 'DeletedDate' in response:
+                return deleted
+            else:
+                return active
+        except ClientError as e:
+
+            if e.response['Error']['Code'] == 'ResourceNotFoundException':
+                print(f"Could not find secret: {secret_name}")
+                return new
+
+            if 'marked for deletion' in e.response['Error']['Message']:
+                print(f"Secret {secret_name} Deleted")
+                return deleted
