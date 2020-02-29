@@ -60,6 +60,7 @@ class KMShelpers():
     def revoke_grants_by_name(self, session, key_id, grant_friendly_id):
         kms_client = session.client('kms')
         grants_list = self.list_grants_paginate(session, key_id)
+        response = None
         for grant in grants_list:
             if grant['Name'] == grant_friendly_id:
                 response = kms_client.revoke_grant(
