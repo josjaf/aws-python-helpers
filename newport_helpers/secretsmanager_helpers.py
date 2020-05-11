@@ -22,24 +22,24 @@ class SecretsManagerHelpers():
     def __init__(self, *args, **kwargs):
         return
 
-    def update_secret(self, session, secret_name, key_data):
-        print(f"Updating Secret {secret_name} with KMS Key: {os.environ.get('KMS_KEY_ID')}")
+    def update_secret(self, session, secret_name, kms_key_id, key_data):
+        print(f"Updating Secret {secret_name} with KMS Key: {kms_key_id}")
         asm = session.client('secretsmanager')
         response = asm.update_secret(
             SecretId=secret_name,
-            KmsKeyId=os.environ.get('KMS_KEY_ID'),
+            KmsKeyId=kms_key_id,
             SecretString=key_data
         )
         pprint.pprint(response)
         return response
 
-    def create_secret(self, session, secret_name, key_data):
+    def create_secret(self, session, secret_name, kms_key_id, key_data):
         asm = session.client('secretsmanager')
-        print(f"Creating Secret {secret_name} with KMS Key: {os.environ.get('KMS_KEY_ID')}")
+        print(f"Creating Secret {secret_name} with KMS Key: {kms_key_id}")
         response = asm.create_secret(
             Name=secret_name,
             # SecretBinary=key_data,
-            KmsKeyId=os.environ.get('KMS_KEY_ID'),
+            KmsKeyId=kms_key_id,
             # ClientRequestToken='string',
             SecretString=key_data
         )
@@ -55,10 +55,10 @@ class SecretsManagerHelpers():
         print(f"Restoring Secret: {secret_name}")
         return response
 
-    def create_update_secret(self, session, secret_name, key_data, index):
+    def create_update_secret(self, session, secret_name, kms_key_id, key_data, index):
         asm = session.client('secretsmanager')
-        if not os.environ.get('KMS_KEY_ID', None):
-            raise RuntimeError(f"os.environ['KMS_KEY_ID'] must be populated")
+        # if not os.environ.get('KMS_KEY_ID', None):
+        #     raise RuntimeError(f"os.environ['KMS_KEY_ID'] must be populated")
         if index >= 5:
             raise Exception("Too many create update secret retries")
         all_secrets = self.get_all_secrets(session)
@@ -76,7 +76,7 @@ class SecretsManagerHelpers():
             if e.response['Error']['Code'] == 'ResourceExistsException':
                 print(f"ERROR, could not find existing secret")
                 print(f"Resource {secret_name} already exists, updating instead")
-                self.update_secret(session, secret_name, key_data)
+                self.update_secret(session, secret_name, kms_key_id, key_data)
 
             # if e.response['Error']['Code'] == 'InvalidRequestException'\
             #         and 'deleted' in e.response['Error']['Code'].lower():
@@ -85,7 +85,7 @@ class SecretsManagerHelpers():
                 self.restore_secret(session, secret_name)
                 index += 1
                 # potential for broken recursion
-                self.create_update_secret(session, secret_name, key_data, index)
+                self.create_update_secret(session, secret_name, kms_key_id, key_data, index)
 
         except Exception as e:
             print(e)
