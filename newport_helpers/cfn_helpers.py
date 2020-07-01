@@ -107,7 +107,7 @@ class CfnHelpers():
         status = None
         counter = 0
         start = datetime.datetime.now()
-        while status is not "CREATE_COMPLETE" or status is not "UPDATE_COMPLETE":
+        while status != "CREATE_COMPLETE" or status !=  "UPDATE_COMPLETE":
             response = cloudformation_client.describe_stacks(
                 StackName=stack_name,
             )
