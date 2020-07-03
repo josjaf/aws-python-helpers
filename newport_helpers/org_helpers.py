@@ -2,10 +2,30 @@ import boto3
 from newport_helpers import helpers
 import threading
 from botocore.exceptions import ClientError
+
 Helpers = helpers.Helpers()
 
 
 class Organization_Helpers():
+
+    def get_org_accounts_dict(self, session):
+        """
+        return a list dictionaries of all accounts in the organization
+        :param session:
+        :return:
+        """
+        org_master_account_id = session.client('sts').get_caller_identity()['Account']
+        org_client = session.client('organizations')
+        accounts = []
+        response = org_client.list_accounts()
+        for account in response['Accounts']:
+            accounts.append(account)
+        while 'NextToken' in response:
+            response = org_client.list_accounts(NextToken=response['NextToken'])
+            for account in response['Accounts']:
+                accounts.append(account)
+        return accounts
+
     def get_org_accounts(self, session, remove_org_master=True):
         """
         return a list of all accounts in the organization
@@ -13,16 +33,8 @@ class Organization_Helpers():
         :return:
         """
         org_master_account_id = session.client('sts').get_caller_identity()['Account']
-        org_client = session.client('organizations')
-        account_ids = []
-        response = org_client.list_accounts()
-        for account in response['Accounts']:
-            account_ids.append(account['Id'])
-        while 'NextToken' in response:
-            response = org_client.list_accounts(NextToken=response['NextToken'])
-            for account in response['Accounts']:
-                account_ids.append(account['Id'])
-
+        accounts = self.get_org_accounts_dict(session)
+        account_ids = [a['Id'] for a in accounts]
         if remove_org_master:
             account_ids.remove(org_master_account_id)
         return account_ids
@@ -44,6 +56,24 @@ class Organization_Helpers():
         account_email = account_id_dict[0]['Email']
         return account_email
 
+    def get_ou_id_from_name(self, org_session, ou_name):
+        org_client = org_session.client('organizations')
+        response = org_client.list_accounts()
+        roots = [i['Id'] for i in org_client.list_roots()['Roots']]
+
+        ous = []
+        response = org_client.list_organizational_units_for_parent(
+            ParentId=roots[0])
+        for ou in response['OrganizationalUnits']:
+            ous.append(ou)
+        while 'NextToken' in response:
+            response = org_client.list_organizational_units_for_parent(
+                ParentId=roots[0], NextToken=response['NextToken'])
+            for ou in response['OrganizationalUnits']:
+                ous.append(ou)
+        ou_id = [ou for ou in ous if ou['Name'] == ou_name][0]['Id']
+        return ou_id
+
     def get_principal_org_id(self, session):
         try:
             organizations = session.client('organizations')
@@ -61,7 +91,18 @@ class Organization_Helpers():
 
         return
 
-    def org_loop_entry(self, org_profile=None, account_role=None):
+    def get_id_account_by_name(self, org_session, account_name):
+        """
+        get an account id by a name
+        :param org_session:
+        :param account_name:
+        :return:
+        """
+        accounts = self.get_org_accounts(org_session)
+        account = [account['Id'] for account in accounts if account['Name'] == account_name]
+        return account
+
+    def org_loop_entry(self, org_profile=None, account_role=None, accounts=None):
         """
         returns a generator for an account loop that takes an org profile and account role in for operational parameters
         :param org_profile:
@@ -74,9 +115,16 @@ class Organization_Helpers():
         if not account_role:
             account_role = 'OrganizationAccountAccessRole'
         session = boto3.session.Session(**session_args)
-        for account in self.get_org_accounts(session):
-            session = Helpers.get_child_session(account, account_role, None)
-            yield account, session
+        if not accounts:
+            for account in self.get_org_accounts(session):
+                session = Helpers.get_child_session(account, account_role, None)
+                yield account, session
+
+        # if there accounts passed into the function, process the accounts.
+        if accounts:
+            for account in accounts:
+                session = Helpers.get_child_session(account, account_role, None)
+                yield account, session
 
     def org_loop_entry_thread_worker(self, account, account_role, session, results):
 
