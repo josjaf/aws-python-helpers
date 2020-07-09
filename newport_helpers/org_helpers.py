@@ -57,6 +57,12 @@ class Organization_Helpers():
         return account_email
 
     def get_ou_id_from_name(self, org_session, ou_name):
+        """
+        get the ou id from a friendly name
+        :param org_session:
+        :param ou_name:
+        :return:
+        """
         org_client = org_session.client('organizations')
         response = org_client.list_accounts()
         roots = [i['Id'] for i in org_client.list_roots()['Roots']]
@@ -75,6 +81,11 @@ class Organization_Helpers():
         return ou_id
 
     def get_principal_org_id(self, session):
+        """
+
+        :param session:
+        :return:
+        """
         try:
             organizations = session.client('organizations')
             response = organizations.describe_organization()
@@ -98,8 +109,8 @@ class Organization_Helpers():
         :param account_name:
         :return:
         """
-        accounts = self.get_org_accounts(org_session)
-        account = [account['Id'] for account in accounts if account['Name'] == account_name]
+        accounts = self.get_org_accounts_dict(org_session)
+        account = [account['Id'] for account in accounts if account['Name'] == account_name][0]
         return account
 
     def org_loop_entry(self, org_profile=None, account_role=None, accounts=None):
