@@ -435,3 +435,28 @@ class CfnHelpers():
 
         #'Status': 'RUNNING' | 'SUCCEEDED' | 'FAILED' | 'STOPPING' | 'STOPPED',
         return
+
+
+    def create_update_stack_instances(self, session, instance_args):
+        """
+        create or update stack instances based on whether there are stack set instances there already
+        :param session:
+        :param instance_args:
+        :return:
+        """
+        cfn = session.client('cloudformation')
+
+        response = cfn.list_stack_instances(StackSetName=instance_args['StackSetName'])
+        if not response['Summaries']:
+            cfn.create_stack_instances(**instance_args)
+
+        else:
+            cfn.update_stack_instances(**instance_args)
+
+        # except botocore.exceptions.ClientError as e:
+        # if e.response['Error']['Code'] == 'StackInstanceNotFoundException':
+        #     response = cfn.create_stack_instances(**stack_set['InstanceArgs'])
+
+    def create_update_stack_set(self, session, stack_set_args):
+
+        return
