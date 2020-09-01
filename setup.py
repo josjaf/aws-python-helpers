@@ -3,7 +3,7 @@ import glob
 
 setup(
     name='newport_helpers',
-    version='0.103',
+    version='0.104',
     packages=['newport_helpers/',
               ],
     license='Creative Commons Attribution-Noncommercial-Share Alike license',
