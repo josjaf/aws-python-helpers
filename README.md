@@ -17,18 +17,21 @@ Python 3.6+
 
 
 # Helpers
-* CloudFormation
-* EC2
-* Organizations
-* SecretsManager
-* Service Catalog
-* KMS
-* Docker
-* ECR
-* Git
-* Zip
-* Parameter Store
-* CodeBuild
-* CodeDeploy
-* CodePipeline
-* IAM
+* This is an example of some of the helpers that are available.
+* `helpers.py` contains an assume role function
+* There are a number of helpers which are not listed here
+    * CloudFormation
+    * EC2
+    * Organizations
+    * SecretsManager
+    * Service Catalog
+    * KMS
+    * Docker
+    * ECR
+    * Git
+    * Zip
+    * Parameter Store
+    * CodeBuild
+    * CodeDeploy
+    * CodePipeline
+    * IAM
