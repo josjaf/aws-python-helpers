@@ -4,9 +4,9 @@ This is a pip install package of the helpers that I use with my projects. Eventu
 
 
 # Installation
-Python 3.6+
-`pip install git+https://github.com/josjaf/aws-python-helpers.git`
-`export PYTHONPATH=$(pwd)`
+* Python 3.6+
+* `pip install git+https://github.com/josjaf/aws-python-helpers.git`
+* `export PYTHONPATH=$(pwd)`
 
 
 # Contributing
