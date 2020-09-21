@@ -1,6 +1,5 @@
 import os
 import datetime
-import git
 import urllib3
 import docker
 import requests
