@@ -42,8 +42,6 @@ class DockerHelpers():
         self.docker_running_check(docker_client)
         t = datetime.datetime.now()
         print("Rebuilding the Container")
-        repo = git.Repo(search_parent_directories=True)
-        sha = repo.head.object.hexsha
 
         # TODO add exception processing for requests.exceptions.ConnectionError when docker dameon is not running
         buildtime = t.strftime("%m-%d-%Y %H:%M:%S")
@@ -84,9 +82,6 @@ class DockerHelpers():
         login_response = ecr.get_authorization_token()
         token = b64decode(login_response['authorizationData'][0]['authorizationToken']).decode()
         username, password = token.split(':', 1)
-        # print(username, password)
-        # print(f"UserName: {username}")
-        # print(f"Password: {password}")
         response = docker_client.login(username=username, password=password, registry=registry, reauth=True, email=None)
         print(response)
         # changing latest to docker
