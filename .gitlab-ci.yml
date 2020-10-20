@@ -1,13 +1,24 @@
 image: "python:3.8"
 
 before_script:
+  - env
   - apt-get update && apt-get upgrade -y
   - apt-get install zip -y
   - python --version
   - which python
   - pip3 install awscli
 
-s3upload:
+test:
+  script:
+    - python -m pip install --upgrade pip
+    - pip install flake8 pytest
+    - if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+    - pip install .
+    - pip install moto
+    - export PYTHONPATH=$(pwd)
+    - python tests/newport_helpers/cfn_helpers.py
+    - python tests/newport_helpers/helpers.py
+deploy:
   script:
     - zip -r source.zip .
 
