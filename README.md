@@ -1,22 +1,24 @@
+![pipeline](https://gitlab.com/josjaf/newport_helpers/badges/master/pipeline.svg)
+
 # Description
 This is a pip install package of the helpers that I use with my projects. Eventually, I will release another repository that implements these helpers and uses them with Python Scripts.
 
 
 
-# Installation
+#### Installation
 * Python 3.6+
 * `pip install git+https://github.com/josjaf/aws-python-helpers.git`
 * `export PYTHONPATH=$(pwd)`
 
 
-# Contributing
+#### Contributing
 * We are looking for functions.
 * I will accept PRs.
 
 
 
 
-# Helpers
+#### Helpers
 * This is an example of some of the helpers that are available.
 * `helpers.py` contains an assume role function
 * There are a number of helpers which are not listed here
