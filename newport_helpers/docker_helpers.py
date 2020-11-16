@@ -81,6 +81,7 @@ class DockerHelpers():
         login_response = ecr.get_authorization_token()
         token = b64decode(login_response['authorizationData'][0]['authorizationToken']).decode()
         username, password = token.split(':', 1)
+        registry = login_response['authorizationData'][0]['proxyEndpoint']
         response = docker_client.login(username=username, password=password, registry=registry, reauth=True, email=None)
         print(response)
         # changing latest to docker
