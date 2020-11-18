@@ -33,8 +33,11 @@ build:
 #    - docker build -t $CI_REGISTRY/group/project/image:latest .
 #    - docker push $CI_REGISTRY/group/project/image:latest
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
-    - docker build -t $CI_REGISTRY/$CI_PROJECT_NAMESPACE/$CI_PROJECT_NAME/image:latest .
-    - docker push $CI_REGISTRY/$CI_PROJECT_NAMESPACE/$CI_PROJECT_NAME/image:latest
+    - docker build -t $CI_REGISTRY/$CI_PROJECT_NAMESPACE/$CI_PROJECT_NAME/main:$CI_COMMIT_BRANCH .
+    - docker push $CI_REGISTRY/$CI_PROJECT_NAMESPACE/$CI_PROJECT_NAME/main:$CI_COMMIT_BRANCH
+  only:
+    - master
+    - dev
 #deploy:
 #  stage: deploy
 #  script:
