@@ -1,7 +1,7 @@
 image: "python:3.8"
 stages:
   - test
-  - deploy
+#  - deploy
   - build
 
 #before_script:
@@ -32,14 +32,14 @@ build:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
     - docker build -t $CI_REGISTRY/group/project/image:latest .
     - docker push $CI_REGISTRY/group/project/image:latest
-deploy:
-  stage: deploy
-  script:
-    - apt-get update && apt-get upgrade -y
-    - apt-get install zip -y
-    - zip -r source.zip .
-    - pip3 install awscli
-    - aws s3 cp source.zip s3://${S3_BUCKET}/source/newport_helpers.zip
+#deploy:
+#  stage: deploy
+#  script:
+#    - apt-get update && apt-get upgrade -y
+#    - apt-get install zip -y
+#    - zip -r source.zip .
+#    - pip3 install awscli
+#    - aws s3 cp source.zip s3://${S3_BUCKET}/source/newport_helpers.zip
 
 #rubocop:
 #  script:
