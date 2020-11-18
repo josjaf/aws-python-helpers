@@ -2,6 +2,7 @@ image: "python:3.8"
 stages:
   - test
   - deploy
+  - build
 
 before_script:
   - env
@@ -22,6 +23,15 @@ test:
     - export PYTHONPATH=$(pwd)
     - python tests/newport_helpers/cfn_helpers.py
     - python tests/newport_helpers/helpers.py
+build:
+  stage: build
+  image: docker:19.03.12
+  services:
+    - docker:19.03.12-dind
+  script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker build -t $CI_REGISTRY/group/project/image:latest .
+    - docker push $CI_REGISTRY/group/project/image:latest
 deploy:
   stage: deploy
   script:
