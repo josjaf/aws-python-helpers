@@ -4,13 +4,13 @@ stages:
   - deploy
   - build
 
-before_script:
-  - env
-  - apt-get update && apt-get upgrade -y
-  - apt-get install zip -y
-  - python --version
-  - which python
-  - pip3 install awscli
+#before_script:
+#  - env
+#  - apt-get update && apt-get upgrade -y
+#  - apt-get install zip -y
+#  - python --version
+#  - which python
+#  - pip3 install awscli
 
 test:
   stage: test
@@ -35,8 +35,10 @@ build:
 deploy:
   stage: deploy
   script:
+    - apt-get update && apt-get upgrade -y
+    - apt-get install zip -y
     - zip -r source.zip .
-
+    - pip3 install awscli
     - aws s3 cp source.zip s3://${S3_BUCKET}/source/newport_helpers.zip
 
 #rubocop:
