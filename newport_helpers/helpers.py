@@ -163,4 +163,21 @@ class Helpers():
         z.close()
         # switch back to original working directory
         os.chdir(original_dir)
-        return
+
+
+    def env_var_to_bool(self, VAR):
+        """
+
+        :param VAR:
+        :return: bool
+        """
+        env_variable = os.getenv(VAR)
+
+        if not env_variable:
+            return_value = False
+        if env_variable:
+            if env_variable in ['True', 'true']:
+                return_value = True
+            else:
+                return_value = False
+        return return_value
