@@ -1,4 +1,4 @@
-from distutils.core import setup
+from setuptools import setup
 import glob
 
 setup(
@@ -10,6 +10,7 @@ setup(
     long_description=open('README.txt').read(),
     author='josjaf',
     author_email='josjaf@gmail.com',
+    setup_requires=['wheel']
     # install_requires=[
     #     'boto3>=1.9.134',
     #     'botocore>=1.12.134',

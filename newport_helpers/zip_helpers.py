@@ -1,5 +1,7 @@
 # get a common prefix
 import os
+from io import BytesIO
+from zipfile import ZipFile
 class ZipHelpers():
     def __init__(self, *args, **kwargs):
         return
@@ -33,3 +35,18 @@ class ZipHelpers():
                 # remove the common prefix
                 zipinfo.filename = name[offset:]
                 yield zipinfo
+    def in_memory_zip(self, files):
+        """
+        files is a list of tuples
+        ('name in archive', 'data local vs bytes')
+        :param files:
+        :return:
+        """
+        in_memory = BytesIO()
+        zf = ZipFile(in_memory, mode="w")
+        for file in files:
+            zf.writestr(file[0], data)
+        zf.close()
+        in_memory.seek(0)
+        data = in_memory.read()
+        return data
