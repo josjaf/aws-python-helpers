@@ -3,6 +3,7 @@ stages:
   - test
 #  - deploy
   - build
+  - upload
 
 #before_script:
 #  - env
@@ -38,6 +39,15 @@ build:
   only:
     - master
     - dev
+upload:
+  stage: upload
+  image: python:latest
+  script:
+    - pip install twine
+    - python setup.py sdist bdist_wheel
+    - TWINE_PASSWORD=${CI_JOB_TOKEN} TWINE_USERNAME=gitlab-ci-token python -m twine upload --verbose --repository-url https://gitlab.com/api/v4/projects/${CI_PROJECT_ID}/packages/pypi dist/*
+  only:
+    - tags
 #deploy:
 #  stage: deploy
 #  script:
@@ -46,7 +56,3 @@ build:
 #    - zip -r source.zip .
 #    - pip3 install awscli
 #    - aws s3 cp source.zip s3://${S3_BUCKET}/source/newport_helpers.zip
-
-#rubocop:
-#  script:
-#    - bundle exec rubocop
