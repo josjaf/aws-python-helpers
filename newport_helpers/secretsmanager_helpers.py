@@ -55,26 +55,27 @@ class SecretsManagerHelpers():
         print(f"Restoring Secret: {secret_name}")
         return response
 
-    def create_update_secret(self, session, secret_name, kms_key_id, key_data, index):
+    def create_update_secret(self, session, secret_name, kms_key_id, key_data, index=0):
+        """
+        this function assumes you don't have any other permission besides create and update secret
+        uses index to avoid infite recursion
+        :param session:
+        :param secret_name:
+        :param kms_key_id:
+        :param key_data:
+        :param index:
+        :return:
+        """
         asm = session.client('secretsmanager')
-        # if not os.environ.get('KMS_KEY_ID', None):
-        #     raise RuntimeError(f"os.environ['KMS_KEY_ID'] must be populated")
         if index >= 5:
             raise Exception("Too many create update secret retries")
-        all_secrets = self.get_all_secrets(session)
         try:
-            if secret_name in all_secrets:
-
-                self.update_secret(asm, secret_name, key_data)
-            else:
-
-                self.create_secret(asm, secret_name, key_data)
+            self.create_secret(asm, secret_name, key_data)
 
         except ClientError as e:
             # print(e)
-            # this should never run because we are now looking up the existing secrets before running create or update to avoid this exception / error
             if e.response['Error']['Code'] == 'ResourceExistsException':
-                print(f"ERROR, could not find existing secret")
+                # print(f"ERROR, could not find existing secret")
                 print(f"Resource {secret_name} already exists, updating instead")
                 self.update_secret(session, secret_name, kms_key_id, key_data)
 
@@ -140,7 +141,7 @@ class SecretsManagerHelpers():
             print("New Parameters: {}".format(parameter_names))
         return
 
-    def get_secret(self, session, secretsmanager, secret_name):
+    def get_secret(self, session, secret_name):
         # if version not specified, this will return the latest version
         asm = session.client('asm')
         try:
@@ -174,7 +175,7 @@ class SecretsManagerHelpers():
             SecretId=secret_name,
             RecoveryWindowInDays=7
         )
-        return
+        return response
 
     def get_all_secrets(self, session):
         asm = session.client('asm')
