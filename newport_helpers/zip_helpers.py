@@ -35,14 +35,28 @@ def in_memory_zip(files):
     """
     files is a list of tuples
     ('name in archive', 'data local vs bytes')
+    this object can be directly uploaded to s3
     :param files:
     :return:
     """
     in_memory = BytesIO()
     zf = ZipFile(in_memory, mode="w")
     for file in files:
-        zf.writestr(file[0], data)
+        with open(file, 'r') as myfile:
+            zip_data = myfile.read()
+        zf.writestr(file, zip_data)
     zf.close()
     in_memory.seek(0)
     data = in_memory.read()
     return data
+
+def write_in_memory_zip_to_file(data: BytesIO, filename: str):
+    """
+    take a bytes io data and write to a file
+    :param data:
+    :param filename:
+    :return:
+    """
+    with open(filename, 'wb') as w:
+        w.write(data)
+    return filename
