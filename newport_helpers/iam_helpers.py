@@ -1,12 +1,4 @@
-import csv
-import os
-import threading
-import uuid
-import zipfile
-import boto3
-import botocore
 import re
-import boto3
 
 
 def get_iam_roles(session):
@@ -27,10 +19,12 @@ def check_iam_role_exists(session, role):
     else:
         return False
 
+
 def split_role_arn(arn):
     account_id = arn.split(":")[4]
     role_name = re.sub(r"^role/", "/", arn.split(":")[5], 1)
     return account_id, role_name
+
 
 def sts_to_iam_arn(session):
     sts = session.client('sts')
@@ -44,4 +38,4 @@ def sts_to_iam_arn(session):
             constructed_arn = response_arn.rsplit("/", 1)[0]
         return constructed_arn
     else:
-            return response_arn
+        return response_arn

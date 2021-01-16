@@ -1,11 +1,9 @@
 import os
 import uuid
 import zipfile
-import botocore
-import logging
+
 import boto3
-
-
+import botocore
 
 
 def get_child_session(account_id, role_name, session=None):
@@ -59,6 +57,7 @@ def get_child_session(account_id, role_name, session=None):
     finally:
         pass
 
+
 def print_separator(text):
     print('\n' * 3)
     print("#" * 75)
@@ -66,11 +65,13 @@ def print_separator(text):
     print("#" * 75)
     return
 
+
 def file_to_string(file_path):
     with open(file_path, 'r') as f:
         file_str = f.read()
         f.close()
     return file_str
+
 
 def dict_to_env_variables(dictionary):
     """
@@ -83,6 +84,7 @@ def dict_to_env_variables(dictionary):
         os.environ[key] = value
 
     return
+
 
 def check_s3_bucket_available(session, bucket_name):
     """
@@ -105,6 +107,7 @@ def check_s3_bucket_available(session, bucket_name):
             raise e
     return True
 
+
 def wildcard_delete(extension, directory='.'):
     assert extension, f"Got Blank Extension"
     for subdir, dirs, files in os.walk(directory):
@@ -115,6 +118,7 @@ def wildcard_delete(extension, directory='.'):
                 print(f"Removing {full_path}")
                 os.remove(full_path)
     return
+
 
 def create_zip_from_dir(dir_to_zip, zip_path=None, ignore_folder_root=True):
     # assert dir_to_zip is str, f"Create Zip needs String"

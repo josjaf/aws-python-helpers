@@ -1,8 +1,3 @@
-import boto3
-
-
-
-
 def _list_keys_raw(session):
     key_id_arr = []
     kms_client = session.client('kms')
@@ -13,12 +8,14 @@ def _list_keys_raw(session):
             key_id_arr.append(item)
     return key_id_arr
 
+
 def list_keys(session):
     key_ids = []
     keys = _list_keys_raw(session)
     for key in keys:
         key_ids.append(key.get('KeyId'))
     return key_ids
+
 
 def _list_aliases_raw(session):
     key_alias_arr = []
@@ -30,6 +27,7 @@ def _list_aliases_raw(session):
             key_alias_arr.append(item)
     return key_alias_arr
 
+
 def list_aliases(session):
     alias_names = []
     aliases = _list_aliases_raw(session)
@@ -37,12 +35,14 @@ def list_aliases(session):
         alias_names.append(alias.get('AliasName'))
     return alias_names
 
+
 def describe_key_from_alias(session, alias):
     if not alias.startswith('alias/'):
         print("alias must start with alias/")
     kms_client = session.client('kms')
     kms_response = kms_client.describe_key(KeyId=alias)
     return kms_response['KeyMetadata']['KeyId']
+
 
 def list_grants_paginate(session, key_id):
     grants_list = []
@@ -53,6 +53,7 @@ def list_grants_paginate(session, key_id):
         for item in page.get('Grants'):
             grants_list.append(item)
     return grants_list
+
 
 def revoke_grants_by_name(session, key_id, grant_friendly_id):
     kms_client = session.client('kms')
@@ -65,6 +66,7 @@ def revoke_grants_by_name(session, key_id, grant_friendly_id):
                 GrantId=grant['GrantId']
             )
     return response
+
 
 def create_idempontent_grant(session, grant_friendly_id, grantee_arn, alias):
     kms_client = session.client('kms')

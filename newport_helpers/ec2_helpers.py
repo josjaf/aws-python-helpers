@@ -13,10 +13,9 @@ def get_endpoint_service_az(session, service_name):
 
     # get the dictionary for the endpoint we are looking for
     endpoint_config = \
-    [d for d in response['ServiceDetails'] if dns_service_name in d['ServiceName']][0]
+        [d for d in response['ServiceDetails'] if dns_service_name in d['ServiceName']][0]
     availability_zones = sorted(endpoint_config['AvailabilityZones'])
 
     return availability_zones
 
 # TODO
-    

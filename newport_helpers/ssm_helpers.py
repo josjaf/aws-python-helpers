@@ -1,11 +1,11 @@
 import time
+
 import boto3
 import botocore
 
 from newport_helpers import log_helpers
 
-logger =log_helpers.get_logger()
-
+logger = log_helpers.get_logger()
 
 
 def command_waiter(session, command_id, instance_id):
@@ -29,6 +29,7 @@ def command_waiter(session, command_id, instance_id):
         time.sleep(10)
     return
 
+
 def get_parameters(session):
     """
     get all the parameters using the paginator, but returns the same response structure as if we used the next token
@@ -48,6 +49,7 @@ def get_parameters(session):
 
     return response
 
+
 def get_parameter_startswith(session, parameter_name):
     """
     :param session:
@@ -59,6 +61,7 @@ def get_parameter_startswith(session, parameter_name):
     # response = ssm.describe_parameters()
     parameter_names = [p['Name'] for p in response['Parameters'] if p['Name'].startswith(parameter_name)]
     return parameter_names
+
 
 def get_parameter(session, parameter_name):
     """

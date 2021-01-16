@@ -1,16 +1,3 @@
-import csv
-import os
-import threading
-import uuid
-import zipfile
-import boto3
-import botocore
-import re
-import boto3
-
-
-
-
 def asg_hooks_present(session, asg_group_name):
     """
     determine whether an autoscaling group has lifecycle hooks
@@ -27,6 +14,8 @@ def asg_hooks_present(session, asg_group_name):
     else:
         print(f"AutoScalingGroup: {asg_group_name} HAS lifecycle hooks")
         return True
+
+
 def get_asg_from_name(session, asg_group_name):
     """
     describe asg from name

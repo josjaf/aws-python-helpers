@@ -4,23 +4,24 @@ import os
 
 def __init__(*args, **kwargs):
     return
+
+
 def get_logger():
     log_level = str(os.environ.get('LOG_LEVEL')).upper()
     if log_level not in ['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL']:
         log_level = 'INFO'
     logger = logging.getLogger()
-    #logging.basicConfig(level=logging.DEBUG)
+    # logging.basicConfig(level=logging.DEBUG)
     logger.setLevel(log_level)
     logger = logging.getLogger(__name__)
     return logger
 
 
 def get_logger_v2():
-
     import logging
 
     # Initialize you log configuration using the base class
-    logging.basicConfig(level = logging.INFO)
+    logging.basicConfig(level=logging.INFO)
 
     # Retrieve the logger instance
     logger = logging.getLogger()
@@ -30,8 +31,8 @@ def get_logger_v2():
 
     return logger
 
-def get_logger_v21():
 
+def get_logger_v21():
     import logging
     logging.getLogger().setLevel(logging.INFO)
     if logging.getLogger().hasHandlers():

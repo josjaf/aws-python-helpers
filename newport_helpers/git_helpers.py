@@ -1,8 +1,6 @@
 import git
 
 
-
-
 def get_commit_sha(dir='.', repo_bare_exception=False):
     """
 

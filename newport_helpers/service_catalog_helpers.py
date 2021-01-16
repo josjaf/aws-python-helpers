@@ -1,6 +1,4 @@
-import boto3
 import botocore
-
 
 
 def get_provisioning_artifact_id(session, prod_id):
@@ -19,6 +17,7 @@ def get_provisioning_artifact_id(session, prod_id):
         raise RuntimeError("Unable to find the Provisioned Artifact Id: " + str(pa_list))
 
     return output
+
 
 def get_launch_path(session, prod_id):
     service_catalog = session.client('servicecatalog')

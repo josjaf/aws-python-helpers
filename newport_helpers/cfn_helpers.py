@@ -1,11 +1,7 @@
-import boto3
-from newport_helpers import helpers
-import botocore
-import uuid
 import datetime
 import time
 
-
+import botocore
 
 
 def dict_to_cfn_parameters(parameters):
@@ -16,6 +12,7 @@ def dict_to_cfn_parameters(parameters):
     """
     parameters = [{"ParameterKey": k, "ParameterValue": v} for k, v in parameters.items()]
     return parameters
+
 
 def stack_create_update_waiter(cfn, args):
     """
@@ -30,6 +27,7 @@ def stack_create_update_waiter(cfn, args):
     else:
         response = cloudformation_waiter(cfn, 'stack_create_complete', args['StackName'])
     return response
+
 
 def cfn_check_stack_exists(session, stack_name):
     """
@@ -75,6 +73,7 @@ def cfn_check_stack_exists(session, stack_name):
     else:
         return False
 
+
 def cloudformation_waiter(client, waiter, stack_name):
     now = datetime.datetime.now()
 
@@ -86,12 +85,14 @@ def cloudformation_waiter(client, waiter, stack_name):
             'MaxAttempts': 15
         }
     )
-    #print(f"Stack: {stack_name}, waiter: {waiter}")
+    # print(f"Stack: {stack_name}, waiter: {waiter}")
     complete = datetime.datetime.now()
-    diff = complete-now
+    diff = complete - now
     # Time will always be in multiples of the sleep
-    #print(f"Stack: {stack_name} took {diff.seconds} to {waiter})")
+    # print(f"Stack: {stack_name} took {diff.seconds} to {waiter})")
     return
+
+
 def stack_complete(session, stack_name):
     """
     Wait for stack to complete, without using a waiter - will raise an exception if the stack fails to create or update, which is why we don't use a waiter for this.
@@ -100,12 +101,12 @@ def stack_complete(session, stack_name):
     :return:
     """
     # wait for stack to register in api first
-    #cloudformation_waiter(cloudformation_client, 'stack_exists', stack_name)
+    # cloudformation_waiter(cloudformation_client, 'stack_exists', stack_name)
     cloudformation_client = session.client('cloudformation')
     status = None
     counter = 0
     start = datetime.datetime.now()
-    while status != "CREATE_COMPLETE" or status !=  "UPDATE_COMPLETE":
+    while status != "CREATE_COMPLETE" or status != "UPDATE_COMPLETE":
         response = cloudformation_client.describe_stacks(
             StackName=stack_name,
         )
@@ -116,17 +117,19 @@ def stack_complete(session, stack_name):
             break
         # status based rollback
         if status == 'ROLLBACK_IN_PROGRESS':
-
             print("Cloudformation Stack: {} failed to Rollback in Progress".format(stack_name))
-            raise RuntimeError(f"Stack: {stack_name} with Status: {status} in Region: {cloudformation_client.meta.region_name}")
+            raise RuntimeError(
+                f"Stack: {stack_name} with Status: {status} in Region: {cloudformation_client.meta.region_name}")
         # if status == 'CREATING':
         #     print("Cloudformation Stack: {} CREATING".format(stack_name))
         #     time.sleep(10)
         #     counter += 1
-        failing_stack_status = ['ROLLBACK_COMPLETE', 'ROLLBACK_IN_PROGRESS', 'CREATE_FAILED', 'UPDATE_ROLLBACK_IN_PROGRESS','UPDATE_ROLLBACK_COMPLETE_CLEANUP_IN_PROGRESS']
+        failing_stack_status = ['ROLLBACK_COMPLETE', 'ROLLBACK_IN_PROGRESS', 'CREATE_FAILED',
+                                'UPDATE_ROLLBACK_IN_PROGRESS', 'UPDATE_ROLLBACK_COMPLETE_CLEANUP_IN_PROGRESS']
         if status in failing_stack_status:
             print(f"Cloudformation Stack: {stack_name} FAILING STACK STATUS: {status}")
-            raise RuntimeError(f"Stack: {stack_name} with FAILING Stack Status: {status} in Region: {cloudformation_client.meta.region_name}")
+            raise RuntimeError(
+                f"Stack: {stack_name} with FAILING Stack Status: {status} in Region: {cloudformation_client.meta.region_name}")
 
         else:
             time.sleep(10)
@@ -142,11 +145,13 @@ def stack_complete(session, stack_name):
     #     start = stack['CreationTime']
     # describe stack events to determine the last one
     complete = datetime.datetime.now()
-    diff = complete-start
-    #TODO Fix time handling, currently time is in multiples of the sleep
+    diff = complete - start
+    # TODO Fix time handling, currently time is in multiples of the sleep
 
     print(f"Stack: {stack_name} took {diff.seconds} seconds")
     return status
+
+
 def create_update_stack(session, args: dict):
     """
     Wrapper for create update stack
@@ -158,7 +163,8 @@ def create_update_stack(session, args: dict):
     """
 
     cloudformation_client = session.client('cloudformation')
-    print("Stack: {} : Creating or Updating in Region: {}".format(args['StackName'], cloudformation_client.meta.region_name))
+    print("Stack: {} : Creating or Updating in Region: {}".format(args['StackName'],
+                                                                  cloudformation_client.meta.region_name))
     stack_exists = cfn_check_stack_exists(session, args['StackName'])
     args['Capabilities'] = ['CAPABILITY_IAM', 'CAPABILITY_NAMED_IAM']
     print(f"Stack: {args['StackName']} Exists Status: {stack_exists}")
@@ -167,6 +173,7 @@ def create_update_stack(session, args: dict):
     else:
         response = cfn_create_stack(session, args)
     return response
+
 
 def cfn_create_stack(session, params):
     """
@@ -193,6 +200,7 @@ def cfn_create_stack(session, params):
             raise e
     except Exception as e:
         raise e
+
 
 def cfn_update_stack(session, params):
     """
@@ -228,6 +236,8 @@ def cfn_update_stack(session, params):
         else:
             raise e
         return e.response
+
+
 def cfn_check_stack_exists(session, stack_name):
     """
     return a bool based on whether stack exists or not
@@ -241,33 +251,37 @@ def cfn_check_stack_exists(session, stack_name):
     cfn = session.client('cloudformation')
     paginator = cfn.get_paginator('list_stacks')
     response_iterator = paginator.paginate(StackStatusFilter=[
-        'CREATE_IN_PROGRESS', 'CREATE_FAILED', 'CREATE_COMPLETE', 'ROLLBACK_IN_PROGRESS', 'ROLLBACK_FAILED', 'ROLLBACK_COMPLETE', 'DELETE_IN_PROGRESS', 'DELETE_FAILED',  'UPDATE_IN_PROGRESS', 'UPDATE_COMPLETE_CLEANUP_IN_PROGRESS', 'UPDATE_COMPLETE', 'UPDATE_ROLLBACK_IN_PROGRESS', 'UPDATE_ROLLBACK_FAILED', 'UPDATE_ROLLBACK_COMPLETE_CLEANUP_IN_PROGRESS', 'UPDATE_ROLLBACK_COMPLETE', 'REVIEW_IN_PROGRESS',
+        'CREATE_IN_PROGRESS', 'CREATE_FAILED', 'CREATE_COMPLETE', 'ROLLBACK_IN_PROGRESS', 'ROLLBACK_FAILED',
+        'ROLLBACK_COMPLETE', 'DELETE_IN_PROGRESS', 'DELETE_FAILED', 'UPDATE_IN_PROGRESS',
+        'UPDATE_COMPLETE_CLEANUP_IN_PROGRESS', 'UPDATE_COMPLETE', 'UPDATE_ROLLBACK_IN_PROGRESS',
+        'UPDATE_ROLLBACK_FAILED', 'UPDATE_ROLLBACK_COMPLETE_CLEANUP_IN_PROGRESS', 'UPDATE_ROLLBACK_COMPLETE',
+        'REVIEW_IN_PROGRESS',
     ])
     # removing delete complete
-    #'DELETE_COMPLETE',
+    # 'DELETE_COMPLETE',
     response = {}
     response['StackSummaries'] = []
     for page in response_iterator:
         for s in page['StackSummaries']:
             response['StackSummaries'].append(s)
 
-
-
-    bad_stack_status = ['ROLLBACK_COMPLETE', 'ROLLBACK_IN_PROGRESS', 'CREATE_FAILED', 'UPDATE_ROLLBACK_IN_PROGRESS','UPDATE_ROLLBACK_COMPLETE_CLEANUP_IN_PROGRESS']
-
+    bad_stack_status = ['ROLLBACK_COMPLETE', 'ROLLBACK_IN_PROGRESS', 'CREATE_FAILED', 'UPDATE_ROLLBACK_IN_PROGRESS',
+                        'UPDATE_ROLLBACK_COMPLETE_CLEANUP_IN_PROGRESS']
 
     stackList = [stack['StackName'] for stack in response['StackSummaries'] if stack['StackStatus'] in bad_stack_status]
     if stack_name in stackList:
         print("Stack: {} in ROLLBACK_COMPLETE. Cannot Continue. ERROR".format(stack_name))
 
-
     good_stack_status = ['CREATE_IN_PROGRESS', 'CREATE_COMPLETE', 'UPDATE_COMPLETE', 'UPDATE_ROLLBACK_COMPLETE']
-    stackList = [stack['StackName'] for stack in response['StackSummaries'] if stack['StackStatus'] in good_stack_status]
+    stackList = [stack['StackName'] for stack in response['StackSummaries'] if
+                 stack['StackStatus'] in good_stack_status]
     # logger.info(stackList)
     if stack_name in stackList:
         return True
     else:
         return False
+
+
 def stack_set_exists_check(session, stack_set_name):
     """
     check if a stack set already exists and return bool
@@ -289,6 +303,8 @@ def stack_set_exists_check(session, stack_set_name):
         return True
     else:
         return False
+
+
 def get_stack_output(session, stack_name, output):
     """
     get the output value from a stack
@@ -307,16 +323,18 @@ def get_stack_output(session, stack_name, output):
     # print(f"response: {stack}")
     if 'Outputs' not in stack:
         print(f"Outputs not found in {stack_name}")
-        #raise RuntimeError(f"Outputs not found in {stack_name}")
+        # raise RuntimeError(f"Outputs not found in {stack_name}")
         return None
     # print(stack['Outputs'])
     try:
         output_value = [o['OutputValue'] for o in stack['Outputs'] if o['OutputKey'] == output][0]
     except:
-        #Exception
+        # Exception
         print(f"Could not find output {output} in {stack_name}")
         raise RuntimeError(f"Could not find output {output} in {stack_name}")
     return output_value
+
+
 def get_stack_set_operations(client_session, stack_set_name, inprogress_status):
     """
     :param client_session:
@@ -341,6 +359,7 @@ def get_stack_set_operations(client_session, stack_set_name, inprogress_status):
 
     inprogress_operations = [s for s in stack_set_operations if s['Status'] in inprogress_status]
     return inprogress_operations
+
 
 def operation_id_waiter(session, stack_name, operation_response):
     """
@@ -374,12 +393,15 @@ def operation_id_waiter(session, stack_name, operation_response):
                 OperationId=op_id
             )
             if response['StackSetOperation']['Status'] in inprogress_status:
-                print(f"StackSet: {stack_name}, Operation Id: {response['StackSetOperation']['OperationId']} still running, have been waiting for {(loop_count*15)}s")
+                print(
+                    f"StackSet: {stack_name}, Operation Id: {response['StackSetOperation']['OperationId']} still running, have been waiting for {(loop_count * 15)}s")
                 loop_count += 1
                 time.sleep(15)
             else:
                 op_busy = False
     return
+
+
 def stack_set_waiter(session, stack_set_name):
     """
     Stack Set waiter, avoid operation in process exception. handle lock between stack set definition and instances
@@ -389,7 +411,7 @@ def stack_set_waiter(session, stack_set_name):
     """
     cfn = session.client('cloudformation')
     # DEBUG
-    #inprogress_operations.append({'OperationId': 'eb2b441e-564f-11e9-b959-0242ac110002', 'Action': 'CREATE', 'Status': 'RUNNING'})
+    # inprogress_operations.append({'OperationId': 'eb2b441e-564f-11e9-b959-0242ac110002', 'Action': 'CREATE', 'Status': 'RUNNING'})
     # DEBUG
     # print("IN PROGRESS OPERATIONS:")
     # print(inprogress_operations)
@@ -400,15 +422,15 @@ def stack_set_waiter(session, stack_set_name):
     if len(inprogress_operations) == 0:
         poll_count = 0
         while len(inprogress_operations) < 1 and poll_count <= 6:
-            poll_count += 1 #increment loop count
-            time.sleep(5) #sleep for 5 seconds
-            inprogress_operations = get_stack_set_operations(cfn, stack_set_name, inprogress_status) # populate again
+            poll_count += 1  # increment loop count
+            time.sleep(5)  # sleep for 5 seconds
+            inprogress_operations = get_stack_set_operations(cfn, stack_set_name, inprogress_status)  # populate again
 
-        if len(inprogress_operations) == 0: # Are you SURE there are no stack set operations running
+        if len(inprogress_operations) == 0:  # Are you SURE there are no stack set operations running
             return "No StackSets to wait on"
         else:
             # This is the edge case where the operation is not immediately registered in the API
-            print(f"STACK SET API RETURNED 0, WAITED {(5*poll_count)}s, NOW THERE IS AN OPERATION!!")
+            print(f"STACK SET API RETURNED 0, WAITED {(5 * poll_count)}s, NOW THERE IS AN OPERATION!!")
     for operation in inprogress_operations:
         running = True
         counter = 0
@@ -420,7 +442,8 @@ def stack_set_waiter(session, stack_set_name):
             # DEBUG
             # response['StackSetOperation']['Status'] = 'RUNNING'
             if response['StackSetOperation']['Status'] in inprogress_status:
-                print(f"Stack Set: {stack_set_name}, Operation Id: {response['StackSetOperation']['OperationId']} still running, have been waiting for {(counter*15)}s")
+                print(
+                    f"Stack Set: {stack_set_name}, Operation Id: {response['StackSetOperation']['OperationId']} still running, have been waiting for {(counter * 15)}s")
 
                 counter += 1
                 if counter > 120:
@@ -431,7 +454,7 @@ def stack_set_waiter(session, stack_set_name):
                 running = False
         print(f"{operation['OperationId']} No Longer Running")
 
-    #'Status': 'RUNNING' | 'SUCCEEDED' | 'FAILED' | 'STOPPING' | 'STOPPED',
+    # 'Status': 'RUNNING' | 'SUCCEEDED' | 'FAILED' | 'STOPPING' | 'STOPPED',
     return
 
 
@@ -455,6 +478,6 @@ def create_update_stack_instances(session, instance_args):
     # if e.response['Error']['Code'] == 'StackInstanceNotFoundException':
     #     response = cfn.create_stack_instances(**stack_set['InstanceArgs'])
 
-def create_update_stack_set(session, stack_set_args):
 
+def create_update_stack_set(session, stack_set_args):
     return

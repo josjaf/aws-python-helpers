@@ -1,7 +1,4 @@
 import time
-import boto3
-
-
 
 
 def codebuild_job_waiter(session, buildId):

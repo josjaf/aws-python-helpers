@@ -1,9 +1,13 @@
-import os
 import datetime
-import urllib3
+from base64 import b64decode
+
 import docker
 import requests
-from base64 import b64decode
+
+from newport_helpers import log_helpers
+
+logger = log_helpers.get_logger()
+
 
 def docker_running_check(docker_client):
     """
@@ -15,16 +19,19 @@ def docker_running_check(docker_client):
     try:
         docker_client.containers.list()
     except requests.exceptions.ConnectionError as e:
-        print("Ensure that Docker Daemon is running")
-        print("Cannot connect to the Docker daemon at unix:///var/run/docker.sock. Is the docker daemon running?")
+        logger.error("Ensure that Docker Daemon is running")
+        logger.error(
+            "Cannot connect to the Docker daemon at unix:///var/run/docker.sock. Is the docker daemon running?")
         raise RuntimeWarning
     except Exception as e:
-        print(type(e))
-        print(e)
+        logger.error(type(e))
+        logger.error(e)
 
     return
+
+
 def docker_build_image(tag, docker_file, labels, path='.'):
-    #TODO Determine whether change directory is required to the same dir as the dockerfile
+    # TODO Determine whether change directory is required to the same dir as the dockerfile
     """
     build docker image locally
     :param tag:
@@ -35,7 +42,7 @@ def docker_build_image(tag, docker_file, labels, path='.'):
     docker_client = docker.from_env()
     docker_running_check(docker_client)
     t = datetime.datetime.now()
-    print("Rebuilding the Container")
+    logger.info("Rebuilding the Container")
 
     # TODO add exception processing for requests.exceptions.ConnectionError when docker dameon is not running
     buildtime = t.strftime("%m-%d-%Y %H:%M:%S")
@@ -43,15 +50,17 @@ def docker_build_image(tag, docker_file, labels, path='.'):
     try:
         response = docker_client.images.build(path=path, tag=tag, labels=labels, dockerfile=docker_file)
         for line in response[1]:
-            print(line)
+            logger.info(line)
 
     except Exception as e:
-        print(e)
+        logger.error(e)
     container_build_time = datetime.datetime.now() - t
-    print(f"Rebuilding the container took: {container_build_time}")
-    print("$ docker run example")
+    logger.info(f"Rebuilding the container took: {container_build_time}")
+    logger.info("$ docker run example")
 
     return
+
+
 def ecr_push(session, tag, ecr_name):
     """
     push local docker imagae to ecr
@@ -78,18 +87,17 @@ def ecr_push(session, tag, ecr_name):
     username, password = token.split(':', 1)
     registry = login_response['authorizationData'][0]['proxyEndpoint']
     response = docker_client.login(username=username, password=password, registry=registry, reauth=True, email=None)
-    print(response)
+    logger.info(response)
     # changing latest to docker
-    for line in docker_client.images.push(registry, tag=tag,stream=True, decode=True,
+    for line in docker_client.images.push(registry, tag=tag, stream=True, decode=True,
                                           auth_config=dict(username=username, password=password)):
-        print(line)
+        logger.info(line)
 
-    print(response)
+    logger.info(response)
     return
 
 
 def run_docker(environment_variables, image_name, container_name, command=None):
-
     docker_client = docker.from_env()
     docker_running_check(docker_client)
     try:
@@ -98,14 +106,14 @@ def run_docker(environment_variables, image_name, container_name, command=None):
     except docker.errors.NotFound:
         pass
     except Exception as e:
-        print(e)
+        logger.info(e)
         raise e
 
-    print(f"Creating Docker Container {container_name} from image: {image_name}")
+    logger.info(f"Creating Docker Container {container_name} from image: {image_name}")
     # mounts = {os.getcwd(): {'bind': '/trident', 'mode': 'rw'}}
 
     environment_variables = environment_variables
-    print(f"env: {environment_variables}")
+    logger.info(f"env: {environment_variables}")
     docker_client.containers.run("example", command=command, detach=True,
                                  environment=environment_variables,
                                  name=container_name,
@@ -113,6 +121,6 @@ def run_docker(environment_variables, image_name, container_name, command=None):
                                              "config": {"max-size": "1m"}}
 
                                  )
-    print(f"docker logs -f {container_name}")
+    logger.info(f"docker logs -f {container_name}")
 
     return

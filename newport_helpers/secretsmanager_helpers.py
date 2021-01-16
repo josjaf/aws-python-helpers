@@ -1,13 +1,8 @@
-import hashlib
-import logging
 import math
 import os
 import pprint
-import socket
 
 from botocore.exceptions import ClientError
-
-
 
 
 def update_secret(session, secret_name, kms_key_id, key_data):
@@ -28,6 +23,7 @@ def update_secret(session, secret_name, kms_key_id, key_data):
     )
     pprint.pprint(response)
     return response
+
 
 def create_secret(session, secret_name, kms_key_id, key_data):
     """
@@ -51,6 +47,7 @@ def create_secret(session, secret_name, kms_key_id, key_data):
     print(f"Creating Secret {secret_name}")
     return response
 
+
 def restore_secret(session, secret_name):
     asm = session.client('secretsmanager')
     response = asm.restore_secret(
@@ -58,6 +55,7 @@ def restore_secret(session, secret_name):
     )
     print(f"Restoring Secret: {secret_name}")
     return response
+
 
 def create_update_secret(session, secret_name, kms_key_id, key_data, index=0):
     """
@@ -97,6 +95,7 @@ def create_update_secret(session, secret_name, kms_key_id, key_data, index=0):
         raise e
     print()
     return
+
 
 def put_secret_chunks(file_path, session, namespace):
     """
@@ -145,6 +144,7 @@ def put_secret_chunks(file_path, session, namespace):
         print("New Parameters: {}".format(parameter_names))
     return
 
+
 def get_secret(session, secret_name):
     # if version not specified, this will return the latest version
     asm = session.client('asm')
@@ -173,6 +173,7 @@ def get_secret(session, secret_name):
             return binary_secret_data
     return
 
+
 def delete_secret(session, secret_name):
     asm = session.client('asm')
     response = asm.delete_secret(
@@ -180,6 +181,7 @@ def delete_secret(session, secret_name):
         RecoveryWindowInDays=7
     )
     return response
+
 
 def get_all_secrets(session):
     asm = session.client('asm')
@@ -197,12 +199,14 @@ def get_all_secrets(session):
 
     return secret_names
 
+
 def get_secret_startswith(session, secret_name):
     asm = session.client('asm')
     all_secrets = get_all_secrets(session)
 
     secret_startswith = [secret for secret in all_secrets if secret.startswith(secret_name)]
     return secret_startswith
+
 
 def check_secret_status(session, secret_name):
     """

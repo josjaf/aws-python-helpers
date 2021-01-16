@@ -1,5 +1,5 @@
 import time
-import boto3
+
 
 def codedeploy_waiter(session, deployment_id):
     code_deploy = session.client('codedeploy')

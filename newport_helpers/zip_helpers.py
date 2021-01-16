@@ -2,6 +2,8 @@
 import os
 from io import BytesIO
 from zipfile import ZipFile
+
+
 def get_members(zip):
     """
     if the zip files have a prefix directory, this will remove it during extraction
@@ -31,6 +33,8 @@ def get_members(zip):
             # remove the common prefix
             zipinfo.filename = name[offset:]
             yield zipinfo
+
+
 def in_memory_zip(files):
     """
     files is a list of tuples
@@ -49,6 +53,7 @@ def in_memory_zip(files):
     in_memory.seek(0)
     data = in_memory.read()
     return data
+
 
 def write_in_memory_zip_to_file(data: BytesIO, filename: str):
     """

@@ -3,12 +3,14 @@ import os
 import tempfile
 import zipfile
 
-import botocore
 import boto3
+import botocore
 
 """
 Codepipeline helpers for when Codepipeline invokes a Lambda
 """
+
+
 def stack_exists(stack):
     """Check if a stack exists or not
 
@@ -51,6 +53,7 @@ def put_job_success(job, message):
     code_pipeline = boto3.client('codepipeline')
     code_pipeline.put_job_success_result(jobId=job)
 
+
 def put_job_failure_from_event(event, message=None):
     """
     Put a job failure from an event
@@ -66,6 +69,7 @@ def put_job_failure_from_event(event, message=None):
         message = 'GenericFailureMessage'
     put_job_failure(job_id, message)
     return
+
 
 def put_job_failure(job, message):
     """Notify CodePipeline of a failed job
@@ -121,10 +125,9 @@ def setup_pipeline_client(job_data, service_client):
     session_token = job_data['artifactCredentials']['sessionToken']
 
     session = boto3.session.Session(aws_access_key_id=key_id,
-                      aws_secret_access_key=key_secret,
-                      aws_session_token=session_token)
+                                    aws_secret_access_key=key_secret,
+                                    aws_session_token=session_token)
     return session.client(service_client)
-
 
 
 def get_user_params(job_data):
@@ -196,12 +199,12 @@ def get_artifact_file(s3, artifact, file_in_zip):
     tmp_file = tempfile.NamedTemporaryFile()
     bucket = artifact['location']['s3Location']['bucketName']
     key = artifact['location']['s3Location']['objectKey']
-    print("Downloading file s3://{}/{} ".format(bucket,key))
-    #response = s3.download_file(bucket, key, "Source.zip")
-    #print(response)
-    #return response
-    #file = os.path.basename(file_in_zip)
-    #dir = os.path.dirname(file_in_zip)
+    print("Downloading file s3://{}/{} ".format(bucket, key))
+    # response = s3.download_file(bucket, key, "Source.zip")
+    # print(response)
+    # return response
+    # file = os.path.basename(file_in_zip)
+    # dir = os.path.dirname(file_in_zip)
 
     zip_file_location = "/tmp/Source.zip"
     try:
@@ -211,10 +214,10 @@ def get_artifact_file(s3, artifact, file_in_zip):
     response = s3.download_file(bucket, key, "/tmp/Source.zip")
 
     z = zipfile.ZipFile(zip_file_location, 'r')
-    #z.extract()
-    #z.extract()
-    #z.extractall("/tmp/")
-    #file  = z.read('secops_account/02-rds-controls.yaml')
+    # z.extract()
+    # z.extract()
+    # z.extractall("/tmp/")
+    # file  = z.read('secops_account/02-rds-controls.yaml')
     file = z.read(file_in_zip)
     z.close()
     return file

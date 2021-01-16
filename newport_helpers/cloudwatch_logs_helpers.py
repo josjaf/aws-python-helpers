@@ -29,6 +29,7 @@ def logs_get_sequence_number(session, log_group, log_stream):
     print(f"Using token {log_stream_data['uploadSequenceToken']}")
     return log_stream_data['uploadSequenceToken']
 
+
 def logs_put_message(session, log_group, log_stream, message):
     logs = session.client('logs')
     kwargs = dict(

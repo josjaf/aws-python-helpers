@@ -1,4 +1,3 @@
-
 def api_gw_get_url_from_name(session, name):
     """
 

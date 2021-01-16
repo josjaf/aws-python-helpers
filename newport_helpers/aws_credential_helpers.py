@@ -1,10 +1,4 @@
 import boto3
-from newport_helpers import helpers
-import botocore
-import uuid
-import datetime
-import time
-
 
 
 def get_credentials():

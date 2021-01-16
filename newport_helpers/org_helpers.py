@@ -1,10 +1,11 @@
-import boto3
-from newport_helpers import helpers
 import threading
+
+import boto3
 from botocore.exceptions import ClientError
 
-helpers = helpers
+from newport_helpers import helpers
 
+helpers = helpers
 
 
 def get_org_accounts_dict(session):
@@ -25,6 +26,7 @@ def get_org_accounts_dict(session):
             accounts.append(account)
     return accounts
 
+
 def get_org_accounts(session, remove_org_master=True):
     """
     return a list of all accounts in the organization
@@ -37,6 +39,7 @@ def get_org_accounts(session, remove_org_master=True):
     if remove_org_master:
         account_ids.remove(org_master_account_id)
     return account_ids
+
 
 def get_account_email_from_organizations(org_session, account_id):
     """
@@ -54,6 +57,7 @@ def get_account_email_from_organizations(org_session, account_id):
     account_id_dict = [a for a in response['Accounts'] if a['Id'] == account_id]
     account_email = account_id_dict[0]['Email']
     return account_email
+
 
 def get_ou_id_from_name(org_session, ou_name):
     """
@@ -79,6 +83,7 @@ def get_ou_id_from_name(org_session, ou_name):
     ou_id = [ou for ou in ous if ou['Name'] == ou_name][0]['Id']
     return ou_id
 
+
 def get_principal_org_id(session):
     """
 
@@ -101,6 +106,7 @@ def get_principal_org_id(session):
 
     return
 
+
 def get_id_account_by_name(org_session, account_name):
     """
     get an account id by a name
@@ -111,6 +117,7 @@ def get_id_account_by_name(org_session, account_name):
     accounts = get_org_accounts_dict(org_session)
     account = [account['Id'] for account in accounts if account['Name'] == account_name][0]
     return account
+
 
 def org_loop_entry(org_profile=None, account_role=None, accounts=None):
     """
@@ -136,11 +143,12 @@ def org_loop_entry(org_profile=None, account_role=None, accounts=None):
             session = helpers.get_child_session(account, account_role, None)
             yield account, session
 
-def org_loop_entry_thread_worker(account, account_role, session, results):
 
+def org_loop_entry_thread_worker(account, account_role, session, results):
     session = helpers.get_child_session(account, account_role, session)
     response = (account, session)
     results.append(response)
+
 
 def org_loop_entry_thread(org_profile=None, account_role=None, remove_org_master=False):
     """

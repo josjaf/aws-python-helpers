@@ -1,7 +1,8 @@
 import hashlib
 
+
 def string_md5_compare(string1, string2):
-    #TODO why would you use this instead of ==? Maybe ssh keys or something like that
+    # TODO why would you use this instead of ==? Maybe ssh keys or something like that
     """
     compare the md5 of two strings
     :param string1:
@@ -15,12 +16,15 @@ def string_md5_compare(string1, string2):
     print("MD5 Match")
     return
 
+
 def file_to_string(file):
     with open(file, 'r') as myfile:
         file_str = myfile.read()
     myfile.close()
 
     return file_str
+
+
 def compare_md5_file(file1_path, file2_path):
     """
     compare the md5 of two files
