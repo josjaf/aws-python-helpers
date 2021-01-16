@@ -47,32 +47,31 @@ class HelpersTest(unittest.TestCase):
     def setUp(self):
         from newport_helpers import cfn_helpers
         CfnHelpers = cfn_helpers
-        rule = CfnHelpers
-        Code = CfnHelpers
+        self.rule = CfnHelpers
+        self.Code = CfnHelpers
 
     def test_dict_to_cfn_parameters(self):
         mocked_dict = {'App': 'Newport', 'Type': 'Helpers'}
         processed_list = [{'ParameterKey': 'App', 'ParameterValue': 'Newport'},
                           {'ParameterKey': 'Type', 'ParameterValue': 'Helpers'}]
-
-        response = cfn_helpers.dict_to_cfn_parameters(mocked_dict)
-        assertEqual(response, processed_list)
+        response = self.rule.dict_to_cfn_parameters(mocked_dict)
+        self.assertEqual(response, processed_list)
 
     def test_check_stack_set_exists(self):
 
 
         mocked_session = Boto3Mock.Session()
-        rule.cfn_check_stack_exists = MagicMock(return_value=True)
-        response = rule.cfn_check_stack_exists(session=mocked_session, stack_name='test')
-        assertEqual(response, True)
+        self.rule.cfn_check_stack_exists = MagicMock(return_value=True)
+        response = self.rule.cfn_check_stack_exists(session=mocked_session, stack_name='test')
+        self.assertEqual(response, True)
     def test_create_update_stack(self):
 
 
         mocked_session = Boto3Mock.Session()
         args = {'StackName': 'Newport-Mock'}
-        rule.cfn_check_stack_exists = MagicMock(return_value=True)
-        response = rule.cfn_check_stack_exists(session=mocked_session, stack_name='test')
-        assertEqual(response, True)
+        self.rule.cfn_check_stack_exists = MagicMock(return_value=True)
+        response = self.rule.cfn_check_stack_exists(session=mocked_session, stack_name='test')
+        self.assertEqual(response, True)
 
 if __name__ == "__main__":
     unittest.main()
