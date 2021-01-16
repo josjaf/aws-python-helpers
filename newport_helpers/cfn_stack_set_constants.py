@@ -1,6 +1,6 @@
 
 class StackSetConstants():
-    def __init__(self, *args, **kwargs):
+    def __init__(*args, **kwargs):
         return
     create_stack_set_args = dict(
             StackSetName='',

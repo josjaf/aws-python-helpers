@@ -44,8 +44,8 @@ class HelpersTest(unittest.TestCase):
     def setUp(self):
         from newport_helpers import helpers
         Helpers = helpers.Helpers()
-        self.rule = Helpers
-        self.Code = Helpers
+        rule = Helpers
+        Code = Helpers
 
     def test_check_s3_bucket_available_not_exists(self):
 
@@ -59,12 +59,12 @@ class HelpersTest(unittest.TestCase):
 
 
         test_args = dict(session=mocked_session, bucket_name=bucket_name)
-        self.rule.check_s3_bucket_available = MagicMock(return_value=mocked_delete_response)
+        rule.check_s3_bucket_available = MagicMock(return_value=mocked_delete_response)
 
-        response = self.rule.check_s3_bucket_available(**test_args)
+        response = rule.check_s3_bucket_available(**test_args)
         # check for delete response
         #response['HTTPStatusCode'] = 204
-        self.assertEqual(response['HTTPStatusCode'], mocked_delete_response['HTTPStatusCode'])
+        assertEqual(response['HTTPStatusCode'], mocked_delete_response['HTTPStatusCode'])
 
     def test_check_s3_bucket_available_not_exists_exception(self):
 
@@ -80,7 +80,7 @@ class HelpersTest(unittest.TestCase):
 
         test_args = dict(session=mocked_session, bucket_name=bucket_name)
         try:
-            self.rule.check_s3_bucket_available = MagicMock(side_effect=mocked_exception)
+            rule.check_s3_bucket_available = MagicMock(side_effect=mocked_exception)
         except botocore.exceptions.ClientError:
-            response = self.rule.check_s3_bucket_available(**test_args)
-            self.assertRaises(botocore.exceptions.ClientError, self.rule.check_s3_bucket_available)
+            response = rule.check_s3_bucket_available(**test_args)
+            assertRaises(botocore.exceptions.ClientError, rule.check_s3_bucket_available)

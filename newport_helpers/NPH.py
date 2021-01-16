@@ -7,7 +7,7 @@ class NPH():
     Super class for importinga
     """
 
-    def __init__(self, *args, **kwargs):
+    def __init__(*args, **kwargs):
         return
 
     Helpers = helpers.Helpers()
