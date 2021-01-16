@@ -4,16 +4,16 @@ from newport_helpers import helpers, docker_helpers, cfn_helpers, iam_helpers, o
 
 class NPH():
     """
-    Super class for importinga
+    Super class for importing
     """
 
     def __init__(*args, **kwargs):
         return
 
-    Helpers = helpers.Helpers()
-    Docker_Helpers = docker_helpers.DockerHelpers()
-    Cfn_Helpers = cfn_helpers.CfnHelpers()
-    Iam_Helpers = iam_helpers.IamHelpers()
-    Org_Helpers = org_helpers.Organization_Helpers()
-    CodeBuild_Helpers = codebuild_helpers.CodeBuildHelpers()
-    AWSCredentialHelpers = aws_credential_helpers.AWSCredentialHelpers()
+    Helpers = helpers
+    Docker_Helpers = docker_helpers
+    Cfn_Helpers = cfn_helpers
+    Iam_Helpers = iam_helpers
+    Org_Helpers = org_helpers
+    CodeBuild_Helpers = codebuild_helpers
+    AWSCredentialHelpers = aws_credential_helpers
