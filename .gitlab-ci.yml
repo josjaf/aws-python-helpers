@@ -20,10 +20,10 @@ test:
     - pip install flake8 pytest
     - if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
     - pip install .
-#     - pip install moto
-#     - export PYTHONPATH=$(pwd)
-#     - python tests/newport_helpers/cfn_helpers.py
-#     - python tests/newport_helpers/helpers.py
+    - pip install moto
+    - export PYTHONPATH=$(pwd)
+    - python tests/newport_helpers/cfn_helpers.py
+    - python tests/newport_helpers/helpers.py
 build:
   stage: build
   image: docker:19.03.12
