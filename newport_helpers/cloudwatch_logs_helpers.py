@@ -1,7 +1,8 @@
 import os
 
 import time
-
+import log_helpers
+logger = log_helpers.get_logger()
 
 def logs_get_sequence_number(session, log_group, log_stream):
     logs = session.client('logs')
@@ -10,7 +11,7 @@ def logs_get_sequence_number(session, log_group, log_stream):
     response = logs.describe_log_streams(logGroupName=log_group)  # logStreamNamePrefix=log_stream)
     log_streams = [lg['logStreamName'] for lg in response['logStreams'] if lg['logStreamName'] == log_stream]
     if log_stream not in log_streams:
-        print("Log Stream does not currently exist")
+        logger.info("Log Stream does not currently exist")
         response = logs.create_log_stream(
             logGroupName=log_group,
             logStreamName=log_stream
@@ -20,13 +21,13 @@ def logs_get_sequence_number(session, log_group, log_stream):
         return
 
     log_stream_data = [lg for lg in response['logStreams'] if lg['logStreamName'] == log_stream][0]
-    print(f"Log Stream Data: {log_stream_data}")
+    logger.info(f"Log Stream Data: {log_stream_data}")
     if 'uploadSequenceToken' not in log_stream_data.keys():
-        print("Found stream without SequenceToken you are probably manually testing. ")
+        logger.info("Found stream without SequenceToken you are probably manually testing. ")
         return
 
     os.environ['uploadSequenceToken'] = log_stream_data['uploadSequenceToken']
-    print(f"Using token {log_stream_data['uploadSequenceToken']}")
+    logger.info(f"Using token {log_stream_data['uploadSequenceToken']}")
     return log_stream_data['uploadSequenceToken']
 
 
@@ -44,9 +45,9 @@ def logs_put_message(session, log_group, log_stream, message):
     )
     if os.environ.get('uploadSequenceToken'):
         kwargs['sequenceToken'] = os.environ['uploadSequenceToken']
-    print(kwargs)
+    logger.info(kwargs)
     response = logs.put_log_events(**kwargs)
-    print(response)
+    logger.info(response)
     if 'nextSequenceToken' in response:
         os.environ['uploadSequenceToken'] = response['nextSequenceToken']
 

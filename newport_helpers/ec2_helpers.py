@@ -1,3 +1,5 @@
+import log_helpers
+logger = log_helpers.get_logger()
 def get_endpoint_service_az(session, service_name):
     """
     get the azs for a specific service
@@ -9,7 +11,7 @@ def get_endpoint_service_az(session, service_name):
     region = session.region_name
     dns_service_name = f'com.amazonaws.{region}.{service_name}'
     response = ec2.describe_vpc_endpoint_services(ServiceNames=[dns_service_name])
-    print(response)
+    logger.info(response)
 
     # get the dictionary for the endpoint we are looking for
     endpoint_config = \

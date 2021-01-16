@@ -1,5 +1,6 @@
 import boto3
-
+import log_helpers
+logger = log_helpers.get_logger()
 
 def get_credentials():
     """
@@ -10,7 +11,7 @@ def get_credentials():
     available_profiles = boto3.session.Session().available_profiles
 
     if 'example' in available_profiles:
-        print("using example profile")
+        logger.info("using example profile")
         session = boto3.session.Session(profile='example')
     else:
         session = boto3.session.Session()

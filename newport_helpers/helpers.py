@@ -4,7 +4,8 @@ import zipfile
 
 import boto3
 import botocore
-
+import log_helpers
+logger = log_helpers.get_logger()
 
 def get_child_session(account_id, role_name, session=None):
     """
@@ -28,7 +29,7 @@ def get_child_session(account_id, role_name, session=None):
         role_name = role_name[1:] if role_name.startswith("/") else role_name
         # never have a slash in front of the role name
         role_arn = 'arn:aws:iam::' + account_id + ':role/' + role_name
-        print("Creating new session with role: {} from {}".format(role_arn, response['Arn']))
+        logger.info("Creating new session with role: {} from {}".format(role_arn, response['Arn']))
 
         response = client.assume_role(
             RoleArn=role_arn,
@@ -51,18 +52,18 @@ def get_child_session(account_id, role_name, session=None):
             raise e
             # raise Exception(f"ERROR:Not authorized to perform sts:AssumeRole on {role_arn}")
         else:
-            print(e)
+            logger.info(e)
             # raise Exception(e)
 
     finally:
         pass
 
 
-def print_separator(text):
-    print('\n' * 3)
-    print("#" * 75)
-    print(text)
-    print("#" * 75)
+def logger.info_separator(text):
+    logger.info('\n' * 3)
+    logger.info("#" * 75)
+    logger.info(text)
+    logger.info("#" * 75)
     return
 
 
@@ -99,7 +100,7 @@ def check_s3_bucket_available(session, bucket_name):
         response = s3.delete_bucket(Bucket=bucket_name)
         return response
     except botocore.exceptions.ClientError as e:
-        print(e)
+        logger.info(e)
 
         if e.response['Error']['Code'] == 'BucketAlreadyExists':
             raise e
@@ -115,7 +116,7 @@ def wildcard_delete(extension, directory='.'):
 
             full_path = (os.path.abspath(os.path.join(subdir, file)))
             if full_path.endswith(extension):
-                print(f"Removing {full_path}")
+                logger.info(f"Removing {full_path}")
                 os.remove(full_path)
     return
 
@@ -132,19 +133,19 @@ def create_zip_from_dir(dir_to_zip, zip_path=None, ignore_folder_root=True):
         zip_path = zip_path + '.zip'
     if not os.path.isabs(zip_path):
         zip_path = os.path.abspath(zip_path)
-    print(f"Zip Path: {zip_path}")
+    logger.info(f"Zip Path: {zip_path}")
     z = zipfile.ZipFile(zip_path, "w")
 
     path = os.path.abspath('.')
     path = os.path.join(path, zip_path)
-    print(f"Creating Zip: {zip_path} of {dir_to_zip}")
+    logger.info(f"Creating Zip: {zip_path} of {dir_to_zip}")
 
     if dir_to_zip.startswith('~'):
         # raise RuntimeError('Tilde not suported')
         dir_to_zip = os.path.expanduser(dir_to_zip)
-        print(dir_to_zip)
+        logger.info(dir_to_zip)
     if dir_to_zip.startswith('/'):
-        print('got absolute path')
+        logger.info('got absolute path')
 
     original_dir = os.path.abspath(os.path.curdir)
     if ignore_folder_root:
@@ -152,14 +153,14 @@ def create_zip_from_dir(dir_to_zip, zip_path=None, ignore_folder_root=True):
 
         os.chdir(dir_to_zip)
         dir_to_zip = '.'
-    # print(f"Current Directory: {os.path.abspath(os.curdir)}")
+    # logger.info(f"Current Directory: {os.path.abspath(os.curdir)}")
     for root, dirs, files in os.walk(dir_to_zip):
 
         # avoid infinite zip recursion
         for file in files:
             if file.endswith(tuple(ignored)): continue
             if file == zip_path: continue
-            # print(os.path.join(root, file))
+            # logger.info(os.path.join(root, file))
             z.write(os.path.join(root, file))
     z.close()
     # switch back to original working directory

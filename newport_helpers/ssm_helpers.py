@@ -88,8 +88,7 @@ def get_parameter(session, parameter_name):
 
 if __name__ == '__main__':
     session = boto3.session.Session()
-    SSMHelpers = SSMHelpers()
-    response = SSMHelpers.get_parameters(session)
+    response = get_parameters(session)
     logger.info(response)
-    params = SSMHelpers.get_parameter_startswith(session, '/')
+    params = get_parameter_startswith(session, '/')
     logger.info(params)

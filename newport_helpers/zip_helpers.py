@@ -2,7 +2,8 @@
 import os
 from io import BytesIO
 from zipfile import ZipFile
-
+import log_helpers
+logger = log_helpers.get_logger()
 
 def get_members(zip):
     """

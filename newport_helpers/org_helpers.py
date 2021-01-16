@@ -4,8 +4,8 @@ import boto3
 from botocore.exceptions import ClientError
 
 from newport_helpers import helpers
-
-helpers = helpers
+import log_helpers
+logger = log_helpers.get_logger()
 
 
 def get_org_accounts_dict(session):
@@ -52,7 +52,7 @@ def get_account_email_from_organizations(org_session, account_id):
     response = org_client.list_accounts()
 
     if account_id not in [a['Id'] for a in response['Accounts']]:
-        print(f"Account ID: {account_id} not found in Organization")
+        logger.info(f"Account ID: {account_id} not found in Organization")
         return False
     account_id_dict = [a for a in response['Accounts'] if a['Id'] == account_id]
     account_email = account_id_dict[0]['Email']
@@ -101,7 +101,7 @@ def get_principal_org_id(session):
 
     except ClientError as e:
         if e.response['Error']['Code'] == 'AWSOrganizationsNotInUseException':
-            print("#" * 75)
+            logger.info("#" * 75)
             raise RuntimeError("CREATE A NEW ORGANIZATION IN ACCOUNT OR JOIN TO CONTINUE")
 
     return
@@ -173,19 +173,19 @@ def org_loop_entry_thread(org_profile=None, account_role=None, remove_org_master
         results.append(response)
 
     org_accounts = get_org_accounts(session, remove_org_master)
-    print(len(org_accounts))
+    logger.info(len(org_accounts))
     for account in org_accounts:
         t = threading.Thread(target=org_loop_entry_thread_worker,
                              args=(account, account_role, session, results))
         # t = threading.Thread(target=worker, args=(account, session, results))
         threads.append(t)
-        print(f"Account {account}")
+        logger.info(f"Account {account}")
         t.start()
 
-    print(len(threads))
+    logger.info(len(threads))
     for thread in threads:
         thread.join()
-    print(results)
+    logger.info(results)
     return results
 
 
@@ -193,4 +193,4 @@ if __name__ == '__main__':
     Organization_helpers = Organization_helpers()
 
     results = Organization_helpers.org_loop_entry_thread()
-    print(results)
+    logger.info(results)

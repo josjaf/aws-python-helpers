@@ -1,3 +1,5 @@
+import log_helpers
+logger = log_helpers.get_logger()
 def _list_keys_raw(session):
     key_id_arr = []
     kms_client = session.client('kms')
@@ -38,7 +40,7 @@ def list_aliases(session):
 
 def describe_key_from_alias(session, alias):
     if not alias.startswith('alias/'):
-        print("alias must start with alias/")
+        logger.info("alias must start with alias/")
     kms_client = session.client('kms')
     kms_response = kms_client.describe_key(KeyId=alias)
     return kms_response['KeyMetadata']['KeyId']

@@ -1,5 +1,6 @@
 import hashlib
-
+import log_helpers
+logger = log_helpers.get_logger()
 
 def string_md5_compare(string1, string2):
     # TODO why would you use this instead of ==? Maybe ssh keys or something like that
@@ -13,7 +14,7 @@ def string_md5_compare(string1, string2):
     test2 = hashlib.md5(string2.encode('utf-8')).hexdigest()
     assert test1 == test2
     # if this statement not, get assert error
-    print("MD5 Match")
+    logger.info("MD5 Match")
     return
 
 
@@ -41,7 +42,7 @@ def compare_md5_file(file1_path, file2_path):
     if file1_md5 != file2_md5:
         raise Exception("Original File and Parameter Store File do not have the same MD5")
     else:
-        print("SUCCESS MD5 Match")
+        logger.info("SUCCESS MD5 Match")
 
     assert file1_md5 == file2_md5
     return

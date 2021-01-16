@@ -1,5 +1,6 @@
 import botocore
-
+import log_helpers
+logger = log_helpers.get_logger()
 
 def get_provisioning_artifact_id(session, prod_id):
     ''' Query for Provisioned Artifact Id '''
@@ -26,5 +27,5 @@ def get_launch_path(session, prod_id):
             ProductId=prod_id)
     except botocore.exceptions.ClientError as e:
         if e.response['Error']['Code'] == 'ResourceNotFoundException':
-            print("Launch Path not found")
+            logger.info("Launch Path not found")
     return response

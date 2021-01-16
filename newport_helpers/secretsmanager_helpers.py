@@ -1,6 +1,7 @@
 import math
 import os
-import pprint
+import log_helpers
+logger = log_helpers.get_logger()
 
 from botocore.exceptions import ClientError
 
@@ -14,14 +15,14 @@ def update_secret(session, secret_name, kms_key_id, key_data):
     :param key_data:
     :return:
     """
-    print(f"Updating Secret {secret_name} with KMS Key: {kms_key_id}")
+    logger.info(f"Updating Secret {secret_name} with KMS Key: {kms_key_id}")
     asm = session.client('secretsmanager')
     response = asm.update_secret(
         SecretId=secret_name,
         KmsKeyId=kms_key_id,
         SecretString=key_data
     )
-    pprint.pprint(response)
+    plogger.info.plogger.info(response)
     return response
 
 
@@ -35,7 +36,7 @@ def create_secret(session, secret_name, kms_key_id, key_data):
     :return:
     """
     asm = session.client('secretsmanager')
-    print(f"Creating Secret {secret_name} with KMS Key: {kms_key_id}")
+    logger.info(f"Creating Secret {secret_name} with KMS Key: {kms_key_id}")
     response = asm.create_secret(
         Name=secret_name,
         # SecretBinary=key_data,
@@ -43,8 +44,8 @@ def create_secret(session, secret_name, kms_key_id, key_data):
         # ClientRequestToken='string',
         SecretString=key_data
     )
-    pprint.pprint(response)
-    print(f"Creating Secret {secret_name}")
+    plogger.info.plogger.info(response)
+    logger.info(f"Creating Secret {secret_name}")
     return response
 
 
@@ -53,7 +54,7 @@ def restore_secret(session, secret_name):
     response = asm.restore_secret(
         SecretId=secret_name
     )
-    print(f"Restoring Secret: {secret_name}")
+    logger.info(f"Restoring Secret: {secret_name}")
     return response
 
 
@@ -75,25 +76,25 @@ def create_update_secret(session, secret_name, kms_key_id, key_data, index=0):
         create_secret(asm, secret_name, key_data)
 
     except ClientError as e:
-        # print(e)
+        # logger.info(e)
         if e.response['Error']['Code'] == 'ResourceExistsException':
-            # print(f"ERROR, could not find existing secret")
-            print(f"Resource {secret_name} already exists, updating instead")
+            # logger.info(f"ERROR, could not find existing secret")
+            logger.info(f"Resource {secret_name} already exists, updating instead")
             update_secret(session, secret_name, kms_key_id, key_data)
 
         # if e.response['Error']['Code'] == 'InvalidRequestException'\
         #         and 'deleted' in e.response['Error']['Code'].lower():
         if e.response['Error']['Code'] == 'InvalidRequestException':
-            print(f"Secret {secret_name} is in deleted state")
+            logger.info(f"Secret {secret_name} is in deleted state")
             restore_secret(session, secret_name)
             index += 1
             # potential for broken recursion
             create_update_secret(session, secret_name, kms_key_id, key_data, index)
 
     except Exception as e:
-        print(e)
+        logger.info(e)
         raise e
-    print()
+    logger.info()
     return
 
 
@@ -113,7 +114,7 @@ def put_secret_chunks(file_path, session, namespace):
 
     # if the total size divided by the chunk size is a whole number, do not round up
     if total_chunks.is_integer():
-        print("RARE: Total Size divded by Chunk Size is a whole number")
+        logger.info("RARE: Total Size divded by Chunk Size is a whole number")
     else:
         total_chunks = math.ceil(total_chunks)
     parameter_names = []
@@ -121,7 +122,7 @@ def put_secret_chunks(file_path, session, namespace):
     # removing 1 from total chunks, instead of changing index to 1 otherwise index will never match total chunks, since index starts at 0
     total_chunks -= 1
     # do not add 1 if there is a 00 at the end
-    print("Splitting File into {} Total Chunks".format(total_chunks))
+    logger.info("Splitting File into {} Total Chunks".format(total_chunks))
     index = 0
     # changed from binary
     # with open(file_path, 'rb') as infile:
@@ -129,10 +130,10 @@ def put_secret_chunks(file_path, session, namespace):
         while True:
 
             chunk = infile.read(chunk_size)
-            print(chunk)
+            logger.info(chunk)
             if not chunk:
                 break
-            print("Chunk {}".format(index))
+            logger.info("Chunk {}".format(index))
 
             parameter_name = "{}-{}".format(namespace, index)
             if index == total_chunks:
@@ -141,7 +142,7 @@ def put_secret_chunks(file_path, session, namespace):
             create_update_secret(session, parameter_name, chunk, 0)
 
             index += 1
-        print("New Parameters: {}".format(parameter_names))
+        logger.info("New Parameters: {}".format(parameter_names))
     return
 
 
@@ -154,13 +155,13 @@ def get_secret(session, secret_name):
         )
     except ClientError as e:
         if e.response['Error']['Code'] == 'ResourceNotFoundException':
-            print("The requested secret " + secret_name + " was not found")
+            logger.info("The requested secret " + secret_name + " was not found")
             raise e
         elif e.response['Error']['Code'] == 'InvalidRequestException':
-            print("The request was invalid due to:", e)
+            logger.info("The request was invalid due to:", e)
             raise e
         elif e.response['Error']['Code'] == 'InvalidParameterException':
-            print("The request had invalid params:", e)
+            logger.info("The request had invalid params:", e)
             raise e
     else:
         # Decrypted secret using the associated KMS CMK
@@ -230,9 +231,9 @@ def check_secret_status(session, secret_name):
     except ClientError as e:
 
         if e.response['Error']['Code'] == 'ResourceNotFoundException':
-            print(f"Could not find secret: {secret_name}")
+            logger.info(f"Could not find secret: {secret_name}")
             return new
 
         if 'marked for deletion' in e.response['Error']['Message']:
-            print(f"Secret {secret_name} Deleted")
+            logger.info(f"Secret {secret_name} Deleted")
             return deleted

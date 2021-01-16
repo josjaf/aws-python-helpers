@@ -1,5 +1,6 @@
 import re
-
+import log_helpers
+logger = log_helpers.get_logger()
 
 def get_iam_roles(session):
     iam = session.client('iam')

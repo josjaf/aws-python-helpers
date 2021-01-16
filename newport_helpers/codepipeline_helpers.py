@@ -5,6 +5,8 @@ import zipfile
 
 import boto3
 import botocore
+import logging
+
 
 """
 Codepipeline helpers for when Codepipeline invokes a Lambda
