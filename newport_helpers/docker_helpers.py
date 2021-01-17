@@ -5,7 +5,7 @@ import docker
 import requests
 
 from newport_helpers import log_helpers
-
+import boto3
 logger = log_helpers.get_logger()
 
 
@@ -18,6 +18,7 @@ def docker_running_check(docker_client):
     """
     try:
         docker_client.containers.list()
+        logger.info('Docker Client Running')
     except requests.exceptions.ConnectionError as e:
         logger.error("Ensure that Docker Daemon is running")
         logger.error(
@@ -54,12 +55,30 @@ def docker_build_image(tag, docker_file, labels, path='.'):
 
     except Exception as e:
         logger.error(e)
+        raise e
     container_build_time = datetime.datetime.now() - t
     logger.info(f"Rebuilding the container took: {container_build_time}")
     logger.info("$ docker run example")
 
     return
 
+def ecr_login(session, ecr_name):
+    region = session.region_name
+    identity = session.client("sts").get_caller_identity()
+    account_id = identity['Account']
+    registry = f"{account_id}.dkr.ecr.{region}.amazonaws.com/{ecr_name}"
+
+    # tag image
+    docker_client = docker.from_env()
+    docker_running_check(docker_client)
+    logger.info(f'Logging into AWS ECR: {registry}')
+    ecr = session.client('ecr', region_name=session.region_name)
+    login_response = ecr.get_authorization_token()
+    token = b64decode(login_response['authorizationData'][0]['authorizationToken']).decode()
+    username, password = token.split(':', 1)
+    registry = login_response['authorizationData'][0]['proxyEndpoint']
+    response = docker_client.login(username=username, password=password, registry=registry, reauth=True, email=None)
+    return response, username, password, registry
 
 def ecr_push(session, tag, ecr_name):
     """
