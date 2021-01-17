@@ -1,11 +1,12 @@
 import datetime
 from base64 import b64decode
 
+import boto3
 import docker
 import requests
 
 from newport_helpers import log_helpers
-import boto3
+
 logger = log_helpers.get_logger()
 
 
@@ -62,7 +63,15 @@ def docker_build_image(tag, docker_file, labels, path='.'):
 
     return
 
+
 def ecr_login(session, ecr_name):
+    """
+
+
+    :param session:
+    :param ecr_name:
+    :return:
+    """
     region = session.region_name
     identity = session.client("sts").get_caller_identity()
     account_id = identity['Account']
@@ -76,36 +85,31 @@ def ecr_login(session, ecr_name):
     login_response = ecr.get_authorization_token()
     token = b64decode(login_response['authorizationData'][0]['authorizationToken']).decode()
     username, password = token.split(':', 1)
-    registry = login_response['authorizationData'][0]['proxyEndpoint']
-    response = docker_client.login(username=username, password=password, registry=registry, reauth=True, email=None)
-    return response, username, password, registry
+    login_registry = login_response['authorizationData'][0]['proxyEndpoint']
+    response = docker_client.login(username=username, password=password, registry=login_registry, reauth=True,
+                                   email=None)
+    return response, username, password, registry, login_registry
+
 
 def ecr_push(session, tag, ecr_name):
     """
     push local docker imagae to ecr
+    do not use proxy endpoint for a push, it will not work
     :param session:
     :param tag:
     :param ecr_name:
     :return:
     """
-    region = session.region_name
-    identity = session.client("sts").get_caller_identity()
-    account_id = identity['Account']
-    registry = f"{account_id}.dkr.ecr.{region}.amazonaws.com/{ecr_name}"
-
+    response, username, password, registry, login_registry = ecr_login(session, ecr_name)
     # tag image
     docker_client = docker.from_env()
     docker_running_check(docker_client)
     image = docker_client.images.get(f'{tag}:latest')
     image.tag(registry, tag)
 
-    # login
-    ecr = session.client('ecr', region_name=session.region_name)
-    login_response = ecr.get_authorization_token()
-    token = b64decode(login_response['authorizationData'][0]['authorizationToken']).decode()
-    username, password = token.split(':', 1)
-    registry = login_response['authorizationData'][0]['proxyEndpoint']
-    response = docker_client.login(username=username, password=password, registry=registry, reauth=True, email=None)
+    # registry = login_response['authorizationData'][0]['proxyEndpoint']
+    # registry = login_response['authorizationData'][0]['proxyEndpoint'].strip('https://')
+    logger.info(f"Registry:  {registry}")
     logger.info(response)
     # changing latest to docker
     for line in docker_client.images.push(registry, tag=tag, stream=True, decode=True,
@@ -125,7 +129,7 @@ def run_docker(environment_variables, image_name, container_name, command=None):
     except docker.errors.NotFound:
         pass
     except Exception as e:
-        logger.info(e)
+        logger.error(e)
         raise e
 
     logger.info(f"Creating Docker Container {container_name} from image: {image_name}")
@@ -143,3 +147,10 @@ def run_docker(environment_variables, image_name, container_name, command=None):
     logger.info(f"docker logs -f {container_name}")
 
     return
+
+
+if __name__ == '__main__':
+    docker_client = docker.DockerClient.from_env()
+    # docker_running_check(docker_client)
+    session = boto3.session.Session()
+    response, username, password, registry = ecr_login(session, 'josjaffe')
