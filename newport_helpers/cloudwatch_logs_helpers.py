@@ -21,7 +21,7 @@ def logs_get_sequence_number(session, log_group, log_stream):
         return
 
     log_stream_data = [lg for lg in response['logStreams'] if lg['logStreamName'] == log_stream][0]
-    logger.info(f"Log Stream Data: {log_stream_data}")
+    logger.debug(f"Log Stream Data: {log_stream_data}")
     if 'uploadSequenceToken' not in log_stream_data.keys():
         logger.info("Found stream without SequenceToken you are probably manually testing. ")
         return
