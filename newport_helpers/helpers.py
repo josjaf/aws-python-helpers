@@ -4,7 +4,7 @@ import zipfile
 
 import boto3
 import botocore
-import log_helpers
+from newport_helpers import log_helpers
 logger = log_helpers.get_logger()
 
 def get_child_session(account_id, role_name, session=None):
@@ -59,11 +59,11 @@ def get_child_session(account_id, role_name, session=None):
         pass
 
 
-def logger.info_separator(text):
-    logger.info('\n' * 3)
-    logger.info("#" * 75)
-    logger.info(text)
-    logger.info("#" * 75)
+def print_separator(text):
+    print('\n' * 3)
+    print("#" * 75)
+    print(text)
+    print("#" * 75)
     return
 
 

@@ -1,4 +1,4 @@
-import log_helpers
+from newport_helpers import log_helpers
 logger = log_helpers.get_logger()
 def _list_keys_raw(session):
     key_id_arr = []

@@ -153,4 +153,4 @@ if __name__ == '__main__':
     docker_client = docker.DockerClient.from_env()
     # docker_running_check(docker_client)
     session = boto3.session.Session()
-    response, username, password, registry = ecr_login(session, 'josjaffe')
+    response, username, password, registry, login_registry = ecr_login(session, 'josjaffe')

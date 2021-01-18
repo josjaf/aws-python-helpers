@@ -2,7 +2,7 @@ import datetime
 import time
 
 import botocore
-import log_helpers
+from newport_helpers import log_helpers
 logger = log_helpers.get_logger()
 
 def dict_to_cfn_parameters(parameters):

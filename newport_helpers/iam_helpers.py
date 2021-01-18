@@ -1,5 +1,6 @@
 import re
-import log_helpers
+from newport_helpers import log_helpers
+import boto3
 logger = log_helpers.get_logger()
 
 def get_iam_roles(session):
@@ -40,3 +41,8 @@ def sts_to_iam_arn(session):
         return constructed_arn
     else:
         return response_arn
+if __name__ == '__main__':
+
+    print(f"Log Level: {logger.level}")
+    logger.info("INFO")
+    session = boto3.session.Session()

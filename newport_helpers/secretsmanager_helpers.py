@@ -1,6 +1,6 @@
 import math
 import os
-import log_helpers
+from newport_helpers import log_helpers
 logger = log_helpers.get_logger()
 
 from botocore.exceptions import ClientError
@@ -22,7 +22,7 @@ def update_secret(session, secret_name, kms_key_id, key_data):
         KmsKeyId=kms_key_id,
         SecretString=key_data
     )
-    plogger.info.plogger.info(response)
+    logger.info(response)
     return response
 
 
@@ -44,7 +44,7 @@ def create_secret(session, secret_name, kms_key_id, key_data):
         # ClientRequestToken='string',
         SecretString=key_data
     )
-    plogger.info.plogger.info(response)
+    logger.info(response)
     logger.info(f"Creating Secret {secret_name}")
     return response
 

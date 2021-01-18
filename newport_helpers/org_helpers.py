@@ -3,8 +3,9 @@ import threading
 import boto3
 from botocore.exceptions import ClientError
 
-from newport_helpers import helpers
-import log_helpers
+
+from newport_helpers import helpers, log_helpers
+
 logger = log_helpers.get_logger()
 
 
@@ -101,7 +102,6 @@ def get_principal_org_id(session):
 
     except ClientError as e:
         if e.response['Error']['Code'] == 'AWSOrganizationsNotInUseException':
-            logger.info("#" * 75)
             raise RuntimeError("CREATE A NEW ORGANIZATION IN ACCOUNT OR JOIN TO CONTINUE")
 
     return
@@ -173,7 +173,7 @@ def org_loop_entry_thread(org_profile=None, account_role=None, remove_org_master
         results.append(response)
 
     org_accounts = get_org_accounts(session, remove_org_master)
-    logger.info(len(org_accounts))
+    logger.info(f"Total Org Accounts: {len(org_accounts)}")
     for account in org_accounts:
         t = threading.Thread(target=org_loop_entry_thread_worker,
                              args=(account, account_role, session, results))
@@ -182,7 +182,7 @@ def org_loop_entry_thread(org_profile=None, account_role=None, remove_org_master
         logger.info(f"Account {account}")
         t.start()
 
-    logger.info(len(threads))
+    # logger.info(len(threads))
     for thread in threads:
         thread.join()
     logger.info(results)
@@ -190,7 +190,9 @@ def org_loop_entry_thread(org_profile=None, account_role=None, remove_org_master
 
 
 if __name__ == '__main__':
-    Organization_helpers = Organization_helpers()
+    # results = org_loop_entry_thread()
+    # logger.info(results)
+    for account, session in org_loop_entry():
+        logger.info(f"Account: {account}")
 
-    results = Organization_helpers.org_loop_entry_thread()
-    logger.info(results)
+
