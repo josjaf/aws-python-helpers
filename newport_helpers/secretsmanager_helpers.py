@@ -73,7 +73,7 @@ def create_update_secret(session, secret_name, kms_key_id, key_data, index=0):
     if index >= 5:
         raise Exception("Too many create update secret retries")
     try:
-        create_secret(asm, secret_name, key_data)
+        create_secret(session, secret_name, kms_key_id, key_data)
 
     except ClientError as e:
         # logger.info(e)
@@ -94,7 +94,6 @@ def create_update_secret(session, secret_name, kms_key_id, key_data, index=0):
     except Exception as e:
         logger.info(e)
         raise e
-    logger.info()
     return
 
 
@@ -106,9 +105,9 @@ def put_secret_chunks(file_path, session, namespace):
     :return:
     """
     # total size in bytes
-    asm = session.client('asm')
+    asm = session.client('secretsmanager')
     total_size = os.path.getsize(file_path)
-    # max ssm parameter store size
+    # max ssm parameter xstore size
     chunk_size = 4096
     total_chunks = (float(total_size) / chunk_size)
 
@@ -148,7 +147,7 @@ def put_secret_chunks(file_path, session, namespace):
 
 def get_secret(session, secret_name):
     # if version not specified, this will return the latest version
-    asm = session.client('asm')
+    asm = session.client('secretsmanager')
     try:
         get_secret_value_response = asm.get_secret_value(
             SecretId=secret_name
@@ -176,7 +175,7 @@ def get_secret(session, secret_name):
 
 
 def delete_secret(session, secret_name):
-    asm = session.client('asm')
+    asm = session.client('secretsmanager')
     response = asm.delete_secret(
         SecretId=secret_name,
         RecoveryWindowInDays=7
@@ -185,7 +184,7 @@ def delete_secret(session, secret_name):
 
 
 def get_all_secrets(session):
-    asm = session.client('asm')
+    asm = session.client('secretsmanager')
     secret_names = []
 
     response = asm.list_secrets()
@@ -202,7 +201,7 @@ def get_all_secrets(session):
 
 
 def get_secret_startswith(session, secret_name):
-    asm = session.client('asm')
+    asm = session.client('secretsmanager')
     all_secrets = get_all_secrets(session)
 
     secret_startswith = [secret for secret in all_secrets if secret.startswith(secret_name)]
@@ -220,7 +219,7 @@ def check_secret_status(session, secret_name):
     active = 'ACTIVE'
     new = 'NEW'
 
-    asm = session.client('asm')
+    asm = session.client('secretsmanager')
     try:
         response = asm.describe_secret(SecretId=secret_name)
 
