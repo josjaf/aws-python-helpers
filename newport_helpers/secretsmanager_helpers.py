@@ -162,16 +162,17 @@ def get_secret(session, secret_name):
         elif e.response['Error']['Code'] == 'InvalidParameterException':
             logger.info("The request had invalid params:", e)
             raise e
-    else:
+        else:
+            logger.info(e)
+            raise e
         # Decrypted secret using the associated KMS CMK
         # Depending on whether the secret was a string or binary, one of these fields will be populated
-        if 'SecretString' in get_secret_value_response:
-            secret = get_secret_value_response['SecretString']
-            return secret
-        else:
-            binary_secret_data = get_secret_value_response['SecretBinary']
-            return binary_secret_data
-    return
+    if 'SecretString' in get_secret_value_response:
+        secret = get_secret_value_response['SecretString']
+        return secret
+    else:
+        binary_secret_data = get_secret_value_response['SecretBinary']
+        return binary_secret_data
 
 
 def delete_secret(session, secret_name):
