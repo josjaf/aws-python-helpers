@@ -167,16 +167,17 @@ def create_zip_from_dir(dir_to_zip, zip_path=None, ignore_folder_root=True):
     os.chdir(original_dir)
 
 
-def env_var_to_bool(VAR):
+def env_var_to_bool(VAR, not_found_return_val=False):
     """
-
+    modify the not found return value as needed
     :param VAR:
-    :return: bool
+    :param not_found_return_val:
+    :return:
     """
     env_variable = os.getenv(VAR)
 
     if not env_variable:
-        return_value = False
+        return_value = not_found_return_val
     if env_variable:
         if env_variable in ['True', 'true']:
             return_value = True
