@@ -16,8 +16,8 @@ def update_secret(session, secret_name, kms_key_id, key_data):
     :return:
     """
     logger.info(f"Updating Secret {secret_name} with KMS Key: {kms_key_id}")
-    asm = session.client('secretsmanager')
-    response = asm.update_secret(
+    secrets_manager = session.client('secretsmanager')
+    response = secrets_manager.update_secret(
         SecretId=secret_name,
         KmsKeyId=kms_key_id,
         SecretString=key_data
@@ -35,9 +35,9 @@ def create_secret(session, secret_name, kms_key_id, key_data):
     :param key_data:
     :return:
     """
-    asm = session.client('secretsmanager')
+    secrets_manager = session.client('secretsmanager')
     logger.info(f"Creating Secret {secret_name} with KMS Key: {kms_key_id}")
-    response = asm.create_secret(
+    response = secrets_manager.create_secret(
         Name=secret_name,
         # SecretBinary=key_data,
         KmsKeyId=kms_key_id,
@@ -50,8 +50,8 @@ def create_secret(session, secret_name, kms_key_id, key_data):
 
 
 def restore_secret(session, secret_name):
-    asm = session.client('secretsmanager')
-    response = asm.restore_secret(
+    secrets_manager = session.client('secretsmanager')
+    response = secrets_manager.restore_secret(
         SecretId=secret_name
     )
     logger.info(f"Restoring Secret: {secret_name}")
@@ -69,7 +69,7 @@ def create_update_secret(session, secret_name, kms_key_id, key_data, index=0):
     :param index:
     :return:
     """
-    asm = session.client('secretsmanager')
+    secrets_manager = session.client('secretsmanager')
     if index >= 5:
         raise Exception("Too many create update secret retries")
     try:
@@ -105,7 +105,7 @@ def put_secret_chunks(file_path, session, namespace):
     :return:
     """
     # total size in bytes
-    asm = session.client('secretsmanager')
+    secrets_manager = session.client('secretsmanager')
     total_size = os.path.getsize(file_path)
     # max ssm parameter xstore size
     chunk_size = 4096
@@ -147,9 +147,9 @@ def put_secret_chunks(file_path, session, namespace):
 
 def get_secret(session, secret_name):
     # if version not specified, this will return the latest version
-    asm = session.client('secretsmanager')
+    secrets_manager = session.client('secretsmanager')
     try:
-        get_secret_value_response = asm.get_secret_value(
+        get_secret_value_response = secrets_manager.get_secret_value(
             SecretId=secret_name
         )
     except ClientError as e:
@@ -176,8 +176,8 @@ def get_secret(session, secret_name):
 
 
 def delete_secret(session, secret_name):
-    asm = session.client('secretsmanager')
-    response = asm.delete_secret(
+    secrets_manager = session.client('secretsmanager')
+    response = secrets_manager.delete_secret(
         SecretId=secret_name,
         RecoveryWindowInDays=7
     )
@@ -185,16 +185,16 @@ def delete_secret(session, secret_name):
 
 
 def get_all_secrets(session):
-    asm = session.client('secretsmanager')
+    secrets_manager = session.client('secretsmanager')
     secret_names = []
 
-    response = asm.list_secrets()
+    response = secrets_manager.list_secrets()
 
     for secret in response['SecretList']:
         secret_names.append(secret['Name'])
 
     while 'NextToken' in response:
-        response = asm.list_secrets(NextToken=response['NextToken'])
+        response = secrets_manager.list_secrets(NextToken=response['NextToken'])
         for secret in response['SecretList']:
             secret_names.append(secret['Name'])
 
@@ -202,7 +202,7 @@ def get_all_secrets(session):
 
 
 def get_secret_startswith(session, secret_name):
-    asm = session.client('secretsmanager')
+    secrets_manager = session.client('secretsmanager')
     all_secrets = get_all_secrets(session)
 
     secret_startswith = [secret for secret in all_secrets if secret.startswith(secret_name)]
@@ -220,9 +220,9 @@ def check_secret_status(session, secret_name):
     active = 'ACTIVE'
     new = 'NEW'
 
-    asm = session.client('secretsmanager')
+    secrets_manager = session.client('secretsmanager')
     try:
-        response = asm.describe_secret(SecretId=secret_name)
+        response = secrets_manager.describe_secret(SecretId=secret_name)
 
         if 'DeletedDate' in response:
             return deleted
