@@ -4,7 +4,8 @@ logger = log_helpers.get_logger()
 
 def get_credentials(session=boto3.session.Session()):
     """
-    get credentials dictionary from boto3, can be used to pass into docker container not running onaws
+    get credentials dictionary from boto3, can be used to pass into docker container not running on aws
+    useful for local testing of docker
     :return:
     """
     credentials = {}

@@ -73,14 +73,14 @@ def create_update_secret(session, secret_name, kms_key_id, key_data, index=0):
     if index >= 5:
         raise Exception("Too many create update secret retries")
     try:
-        create_secret(session, secret_name, kms_key_id, key_data)
+        response = create_secret(session, secret_name, kms_key_id, key_data)
 
     except ClientError as e:
         # logger.info(e)
         if e.response['Error']['Code'] == 'ResourceExistsException':
             # logger.info(f"ERROR, could not find existing secret")
             logger.info(f"Resource {secret_name} already exists, updating instead")
-            update_secret(session, secret_name, kms_key_id, key_data)
+            response = update_secret(session, secret_name, kms_key_id, key_data)
 
         # if e.response['Error']['Code'] == 'InvalidRequestException'\
         #         and 'deleted' in e.response['Error']['Code'].lower():
@@ -89,12 +89,12 @@ def create_update_secret(session, secret_name, kms_key_id, key_data, index=0):
             restore_secret(session, secret_name)
             index += 1
             # potential for broken recursion
-            create_update_secret(session, secret_name, kms_key_id, key_data, index)
+            response = create_update_secret(session, secret_name, kms_key_id, key_data, index)
 
     except Exception as e:
         logger.info(e)
         raise e
-    return
+    return response
 
 
 def put_secret_chunks(file_path, session, namespace):

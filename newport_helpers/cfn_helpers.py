@@ -15,18 +15,18 @@ def dict_to_cfn_parameters(parameters):
     return parameters
 
 
-def stack_create_update_waiter(cfn, args):
+def stack_create_update_waiter(session, args):
     """
     Wrapper function around waiters to determine which waiter to use - CREATE/UPDATE
     :param cfn:
     :param args:
     :return:
     """
-    stack_exists = cfn_check_stack_exists(cfn, args['StackName'])
+    stack_exists = cfn_check_stack_exists(session, args['StackName'])
     if stack_exists:
-        response = cloudformation_waiter(cfn, 'stack_update_complete', args['StackName'])
+        response = cloudformation_waiter(session, 'stack_update_complete', args['StackName'])
     else:
-        response = cloudformation_waiter(cfn, 'stack_create_complete', args['StackName'])
+        response = cloudformation_waiter(session, 'stack_create_complete', args['StackName'])
     return response
 
 
@@ -75,7 +75,8 @@ def cfn_check_stack_exists(session, stack_name):
         return False
 
 
-def cloudformation_waiter(client, waiter, stack_name):
+def cloudformation_waiter(session, waiter, stack_name):
+    client = session.client('cloudformation')
     now = datetime.datetime.now()
 
     waiter = client.get_waiter(waiter)
