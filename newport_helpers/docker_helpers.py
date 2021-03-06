@@ -5,7 +5,7 @@ import boto3
 import docker
 import requests
 
-from newport_helpers import log_helpers
+from . import log_helpers
 
 logger = log_helpers.get_logger()
 

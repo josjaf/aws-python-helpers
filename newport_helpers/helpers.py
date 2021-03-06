@@ -4,7 +4,7 @@ import zipfile
 
 import boto3
 import botocore
-from newport_helpers import log_helpers
+from . import log_helpers
 logger = log_helpers.get_logger()
 
 def get_child_session(account_id, role_name, session=None):
@@ -52,7 +52,7 @@ def get_child_session(account_id, role_name, session=None):
             raise e
             # raise Exception(f"ERROR:Not authorized to perform sts:AssumeRole on {role_arn}")
         else:
-            logger.info(e)
+            logger.error(e)
             # raise Exception(e)
 
     finally:

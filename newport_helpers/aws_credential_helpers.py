@@ -1,5 +1,5 @@
 import boto3
-from newport_helpers import log_helpers
+from . import log_helpers
 logger = log_helpers.get_logger()
 
 def get_credentials(session=boto3.session.Session()):

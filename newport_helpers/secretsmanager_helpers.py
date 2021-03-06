@@ -1,6 +1,6 @@
 import math
 import os
-from newport_helpers import log_helpers
+from . import log_helpers
 logger = log_helpers.get_logger()
 
 from botocore.exceptions import ClientError

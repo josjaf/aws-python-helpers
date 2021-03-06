@@ -1,4 +1,4 @@
-from newport_helpers import log_helpers
+from . import log_helpers
 logger = log_helpers.get_logger()
 def get_endpoint_service_az(session, service_name):
     """
