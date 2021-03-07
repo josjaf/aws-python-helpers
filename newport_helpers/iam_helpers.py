@@ -2,7 +2,7 @@ import re
 
 import boto3
 
-from . import log_helpers
+from newport_helpers import log_helpers
 
 logger = log_helpers.get_logger()
 
@@ -70,6 +70,12 @@ def delete_old_access_key(session, user):
 
 
 def delete_access_keys(session, user):
+    """
+    delete all the access key of an iam user
+    :param session:
+    :param user:
+    :return:
+    """
     iam = session.client('iam')
     try:
         keylist = iam.list_access_keys(UserName=user)['AccessKeyMetadata']

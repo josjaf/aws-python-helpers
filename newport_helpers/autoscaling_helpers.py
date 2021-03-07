@@ -1,4 +1,4 @@
-from . import log_helpers
+from newport_helpers import log_helpers
 logger = log_helpers.get_logger()
 def asg_hooks_present(session, asg_group_name: str):
     """

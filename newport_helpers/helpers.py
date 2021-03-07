@@ -4,7 +4,7 @@ import zipfile
 
 import boto3
 import botocore
-from . import log_helpers
+from newport_helpers import log_helpers
 logger = log_helpers.get_logger()
 
 def get_child_session(account_id, role_name, session=None):
