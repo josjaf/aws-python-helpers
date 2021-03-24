@@ -1,5 +1,8 @@
-from newport_helpers import log_helpers
-logger = log_helpers.get_logger()
+import newport_helpers
+
+logger = newport_helpers.NewportHelpers().logger
+
+
 def get_endpoint_service_az(session, service_name):
     """
     get the azs for a specific service
@@ -19,5 +22,46 @@ def get_endpoint_service_az(session, service_name):
     availability_zones = sorted(endpoint_config['AvailabilityZones'])
 
     return availability_zones
+
+
+def get_vpcs_all_regions(session):
+    """
+    Get all of the vpcs in an account
+    :param session:
+    :return:
+    """
+    vpcs = []
+    ec2 = session.client('ec2')
+    response = ec2.describe_regions()
+    for region in response['Regions']:
+        ec2 = session.client('ec2', region_name=region['RegionName'])
+        response = ec2.describe_vpcs()
+        for vpc in response['Vpcs']:
+            vpc['Region'] = region['RegionName']
+            # print(f"Region: {region['RegionName']}, VPC:{vpc['VpcId']}")
+            vpcs.append(vpc)
+    return vpcs
+
+
+def route_table_public_private(session):
+    """
+    Determine wheter a route table has a route to an igw
+    :param session:
+    :return:
+    """
+    processed_route_tables = []
+    ec2 = session.client('ec2')
+    response = ec2.describe_route_tables()
+    for rt in response['RouteTables']:
+        for route in rt['Routes']:
+            print(route)
+            rt['Public'] = False
+            if route.get('DestinationCidrBlock') == '0.0.0.0/0' and route.get('GatewayId') and route.get(
+                    'GatewayId').startswith('igw'):
+                print(f"FOUND IGW  on RT: {rt['RouteTableId']}")
+                rt['Public'] = True
+                break
+                
+        processed_route_tables.append(rt)
 
 # TODO
