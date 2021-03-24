@@ -1,8 +1,8 @@
 import os
 
 import time
-from newport_helpers import log_helpers
-logger = log_helpers.get_logger()
+import newport_helpers
+logger = newport_helpers.nph.logger
 
 def logs_get_sequence_number(session, log_group, log_stream):
     logs = session.client('logs')

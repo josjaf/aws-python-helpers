@@ -1,6 +1,6 @@
 import hashlib
-from newport_helpers import log_helpers
-logger = log_helpers.get_logger()
+import newport_helpers
+logger = newport_helpers.nph.logger
 
 def string_md5_compare(string1, string2):
     # TODO why would you use this instead of ==? Maybe ssh keys or something like that

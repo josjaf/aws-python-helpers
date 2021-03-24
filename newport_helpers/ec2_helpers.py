@@ -1,6 +1,5 @@
 import newport_helpers
-
-logger = newport_helpers.NewportHelpers().logger
+logger = newport_helpers.nph.logger
 
 
 def get_endpoint_service_az(session, service_name):
@@ -61,7 +60,7 @@ def route_table_public_private(session):
                 print(f"FOUND IGW  on RT: {rt['RouteTableId']}")
                 rt['Public'] = True
                 break
-                
+
         processed_route_tables.append(rt)
 
 # TODO

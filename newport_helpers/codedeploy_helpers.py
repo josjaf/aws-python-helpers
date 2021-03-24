@@ -1,6 +1,6 @@
 import time
-from newport_helpers import log_helpers
-logger = log_helpers.get_logger()
+import newport_helpers
+logger = newport_helpers.nph.logger
 
 def codedeploy_waiter(session, deployment_id):
     code_deploy = session.client('codedeploy')

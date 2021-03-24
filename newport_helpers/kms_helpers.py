@@ -1,5 +1,5 @@
-from newport_helpers import log_helpers
-logger = log_helpers.get_logger()
+import newport_helpers
+logger = newport_helpers.nph.logger
 def _list_keys_raw(session):
     key_id_arr = []
     kms_client = session.client('kms')
@@ -85,3 +85,8 @@ def create_idempontent_grant(session, grant_friendly_id, grantee_arn, alias):
         Name=grant_friendly_id
     )
     return response
+if __name__ == '__main__':
+    import boto3
+    session = boto3.session.Session()
+    response = _list_keys_raw(session)
+    print(response)

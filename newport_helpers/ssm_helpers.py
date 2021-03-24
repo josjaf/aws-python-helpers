@@ -2,9 +2,11 @@ import time
 
 import boto3
 import botocore
-from newport_helpers import log_helpers
+import time
+import newport_helpers
+logger = newport_helpers.nph.logger
 
-logger = log_helpers.get_logger()
+
 
 
 def command_waiter(session, command_id, instance_id):
