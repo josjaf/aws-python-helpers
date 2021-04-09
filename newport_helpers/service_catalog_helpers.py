@@ -50,8 +50,9 @@ def wait_for_provisioned_product(session, provisioned_product_id):
     counter = 0
     sleep_time = 60
     # 'AVAILABLE'|'UNDER_CHANGE'|'TAINTED'|'ERROR'|'PLAN_IN_PROGRESS'
+    pp_status = 'UNDER_CHANGE'
     while pp_status == 'UNDER_CHANGE' or pp_status == 'PLAN_IN_PROGRESS':
-        print(f"Sleeping for {sleep_time}, waiting for ProvisionedProductId: {provisioned_product_id}")
+        logger.info(f"Sleeping for {sleep_time}, waiting for ProvisionedProductId: {provisioned_product_id}")
         time.sleep(sleep_time)
 
         # pp_status = get_provisioned_product_status(provisioned_product_name)
@@ -60,17 +61,17 @@ def wait_for_provisioned_product(session, provisioned_product_id):
             Id=provisioned_product_id
         )
         pp_status = response['ProvisionedProductDetail']['Status']
-        print(f"Waiting for {counter * sleep_time}")
+        logger.info(f"Waiting for {counter * sleep_time}")
         if pp_status == 'AVAILABLE':
-            print(f"SUCCESS: Product: {provisioned_product_id} is {pp_status}")
+            logger.info(f"SUCCESS: Product: {provisioned_product_id} is {pp_status}")
             break
         if pp_status == 'ERROR':
             raise Exception(f"ProvisionedProduct Stack: {provisioned_product_id} ERROR")
         if counter > 90:
-            print(f"ProvisionedProduct Stack: {provisioned_product_id} failed out of counter")
+            logger.info(f"ProvisionedProduct Stack: {provisioned_product_id} failed out of counter")
             raise Exception(f"ProvisionedProduct Stack: {provisioned_product_id} failed out of counter")
         if pp_status == "TAINTED":
-            print(f"Product: {provisioned_product_id} is {pp_status}")
+            logger.info(f"Product: {provisioned_product_id} is {pp_status}")
             break
             # TODO Determine whether or not to break here
     return provisioned_product_id
