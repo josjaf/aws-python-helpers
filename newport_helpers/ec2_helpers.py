@@ -1,6 +1,33 @@
 import newport_helpers
+
 logger = newport_helpers.nph.logger
 
+def get_latest_ami_by_tag(session, tag):
+    """
+    latest image by ec2 tag
+    :param session:
+    :param tag:
+    :return:
+    """
+    ec2 = session.client('ec2')
+    response = ec2.describe_images(
+
+        Filters=[
+            {
+                'Name': 'tag:AppName',
+                'Values': [
+                    tag,
+                ]
+            },
+        ],
+
+        Owners=[
+            'self',
+        ],
+    )
+    images = sorted(response['Images'], key=lambda i: i['CreationDate'], reverse=True)
+    latest_image = images[0]['ImageId']
+    return latest_image, images
 
 def get_endpoint_service_az(session, service_name):
     """
@@ -63,4 +90,5 @@ def route_table_public_private(session):
 
         processed_route_tables.append(rt)
 
-# TODO
+
+
