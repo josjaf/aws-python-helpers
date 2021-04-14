@@ -1,6 +1,8 @@
 import math
 import os
+
 import newport_helpers
+
 logger = newport_helpers.nph.logger
 
 from botocore.exceptions import ClientError
@@ -175,12 +177,20 @@ def get_secret(session, secret_name):
         return binary_secret_data
 
 
-def delete_secret(session, secret_name):
+def delete_secret(session, secret_name, force=False):
+    """
+    Force is usually cleaner, but more destructive for creating the secret again
+    :param session:
+    :param secret_name:
+    :param force:
+    :return:
+    """
     secrets_manager = session.client('secretsmanager')
-    response = secrets_manager.delete_secret(
-        SecretId=secret_name,
-        RecoveryWindowInDays=7
-    )
+    payload = dict(SecretId=secret_name,RecoveryWindowInDays=7)
+    if force:
+        payload['ForceDeleteWithoutRecovery'] = True
+    response = secrets_manager.delete_secret(**payload)
+    ##An asynchronous background process performs the actual deletion, so there can be a short delay before the operation completes.
     return response
 
 
@@ -237,3 +247,48 @@ def check_secret_status(session, secret_name):
         if 'marked for deletion' in e.response['Error']['Message']:
             logger.info(f"Secret {secret_name} Deleted")
             return deleted
+
+
+def reset_rotation(session, secret_arn):
+    """
+    Reset a secret that is stuck is AWSPENDING and rotate the secret
+    :param session:
+    :param secret_arn:
+    :return:
+    """
+    secrets_manager = session.client('secretsmanager')
+    response = secrets_manager.list_secret_version_ids(
+        SecretId=secret_arn,
+    )
+    version = [i for i in response['Versions'] if 'AWSPENDING' in i['VersionStages']]
+    try:
+        version_id = [i for i in response['Versions'] if 'AWSPENDING' in i['VersionStages']][0]['VersionId']
+        response = secrets_manager.update_secret_version_stage(
+            SecretId=secret_arn,
+            VersionStage='AWSPENDING',
+            RemoveFromVersionId=version_id,
+            # MoveToVersionId='string'
+        )
+        logger.info(f"Removing pending: {version_id}")
+        logger.info(response)
+    except:
+        pass
+    response = secrets_manager.list_secret_version_ids(
+        SecretId=secret_arn,
+    )
+    try:
+        response = secrets_manager.cancel_rotate_secret(
+            SecretId=secret_arn
+        )
+    except:
+        pass
+    response = secrets_manager.rotate_secret(
+        SecretId=secret_arn,
+        # ClientRequestToken='string',
+        # RotationLambdaARN='string',
+        # RotationRules={
+        #     'AutomaticallyAfterDays': 123
+        # }
+    )
+    logger.info(response)
+    return response
