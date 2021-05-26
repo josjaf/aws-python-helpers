@@ -2,7 +2,7 @@ import math
 import os
 
 import newport_helpers
-
+from newport_helpers import helpers
 logger = newport_helpers.nph.logger
 
 from botocore.exceptions import ClientError
@@ -195,26 +195,39 @@ def delete_secret(session, secret_name, force=False):
 
 
 def get_all_secrets(session):
+    """
+    get secret names
+    :param session:
+    :return:
+    """
     secrets_manager = session.client('secretsmanager')
-    secret_names = []
+    secrets = []
 
     response = secrets_manager.list_secrets()
 
     for secret in response['SecretList']:
-        secret_names.append(secret['Name'])
+        secrets.append(secret)
 
     while 'NextToken' in response:
         response = secrets_manager.list_secrets(NextToken=response['NextToken'])
         for secret in response['SecretList']:
-            secret_names.append(secret['Name'])
+            secrets.append(secret)
 
-    return secret_names
+    return secrets
 
+def get_all_serets_pag(session):
+    """
+    call the generic paginator
+    :param session:
+    :return:
+    """
+    results = helpers.paginator_generic(session, 'secretsmanager', 'list_secrets', 'SecretList')
+    return results
 
 def get_secret_startswith(session, secret_name):
     secrets_manager = session.client('secretsmanager')
     all_secrets = get_all_secrets(session)
-
+    secret_names = [i['Name'] for i in all_secrets]
     secret_startswith = [secret for secret in all_secrets if secret.startswith(secret_name)]
     return secret_startswith
 
@@ -252,6 +265,7 @@ def check_secret_status(session, secret_name):
 def reset_rotation(session, secret_arn):
     """
     Reset a secret that is stuck is AWSPENDING and rotate the secret
+    This is useful for when you are developing a lambda that rotates secrets
     :param session:
     :param secret_arn:
     :return:
